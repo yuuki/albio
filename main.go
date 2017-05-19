@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/yuuki/albio/pkg/command"
 )
 
 // CLI is the command line object.
@@ -23,6 +25,8 @@ func main() {
 func (cli *CLI) Run(args []string) int {
 	var (
 		version bool
+		in      bool
+		out     bool
 	)
 
 	flags := flag.NewFlagSet(Name, flag.ContinueOnError)
@@ -30,11 +34,22 @@ func (cli *CLI) Run(args []string) int {
 	flags.Usage = func() {
 		fmt.Fprint(cli.errStream, helpText)
 	}
+	flags.BoolVar(&out, "out", false, "")
 	flags.BoolVar(&version, "version", false, "")
 	flags.BoolVar(&version, "v", false, "")
 
 	if err := flags.Parse(args[1:]); err != nil {
 		return 1
+	}
+
+	if in {
+	} else if out {
+		if err := command.Detach(); err != nil {
+			fmt.Fprintln(cli.errStream, err)
+			return 2
+		}
+	} else {
+		fmt.Fprint(cli.errStream, helpText)
 	}
 
 	if version {
@@ -51,5 +66,6 @@ Usage: albio [options]
   A CLI tool to service in/out from AWS Loadbalancer such as ELB/ALB.
 
 Options:
+  --out                   service out
   --version, -v           print version
 `
