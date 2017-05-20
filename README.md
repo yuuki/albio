@@ -1,7 +1,7 @@
 albio
 =====
 
-A CLI tool to service in/out from AWS Loadbalancer such as ELB/ALB.
+A CLI tool to gracefully manage instances on ELB or ALB.
 
 ```shell
 $ albio --out --execute
