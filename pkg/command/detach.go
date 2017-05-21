@@ -1,7 +1,7 @@
 package command
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 
@@ -15,10 +15,17 @@ func Detach() error {
 	if err != nil {
 		return err
 	}
-	lbNames, err := elb.New(sess).GetLoadBalancersFromInstanceID(instanceID)
+
+	lbClient := elb.New(sess)
+	lbNames, err := lbClient.GetLoadBalancersFromInstanceID(instanceID)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%+v", lbNames)
+
+	log.Println("-->", "Detaching", instanceID, "from", lbNames)
+	if err := lbClient.RemoveInstanceFromLoadBalancers(instanceID, lbNames); err != nil {
+		return err
+	}
+
 	return nil
 }

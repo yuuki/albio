@@ -1,6 +1,7 @@
 package elb
 
 import (
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	goelb "github.com/aws/aws-sdk-go/service/elb"
 	"github.com/aws/aws-sdk-go/service/elb/elbiface"
@@ -8,6 +9,7 @@ import (
 
 type ELB interface {
 	GetLoadBalancersFromInstanceID(string) ([]string, error)
+	RemoveInstanceFromLoadBalancers(string, []string) error
 }
 
 type _elb struct {
@@ -34,4 +36,19 @@ func (e *_elb) GetLoadBalancersFromInstanceID(instanceID string) ([]string, erro
 		}
 	}
 	return lbNames, nil
+}
+
+func (e *_elb) RemoveInstanceFromLoadBalancers(instanceID string, lbNames []string) error {
+	for _, lbName := range lbNames {
+		_, err := e.svc.DeregisterInstancesFromLoadBalancer(
+			&goelb.DeregisterInstancesFromLoadBalancerInput{
+				Instances:        []*goelb.Instance{{InstanceId: aws.String(instanceID)}},
+				LoadBalancerName: aws.String(lbName),
+			},
+		)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
