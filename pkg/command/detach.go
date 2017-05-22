@@ -1,6 +1,7 @@
 package command
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -20,6 +21,9 @@ func Detach() error {
 	lbNames, err := lbClient.GetLoadBalancersFromInstanceID(instanceID)
 	if err != nil {
 		return err
+	}
+	if len(lbNames) < 1 {
+		return fmt.Errorf("%s is not attached any loadbalancers")
 	}
 
 	log.Println("-->", "Detaching", instanceID, "from", lbNames)
