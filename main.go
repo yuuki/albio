@@ -25,7 +25,7 @@ func main() {
 func (cli *CLI) Run(args []string) int {
 	var (
 		version bool
-		in      bool
+		attach  bool
 		detach  bool
 	)
 
@@ -34,6 +34,7 @@ func (cli *CLI) Run(args []string) int {
 	flags.Usage = func() {
 		fmt.Fprint(cli.errStream, helpText)
 	}
+	flags.BoolVar(&attach, "attach", false, "")
 	flags.BoolVar(&detach, "detach", false, "")
 	flags.BoolVar(&version, "version", false, "")
 	flags.BoolVar(&version, "v", false, "")
@@ -42,7 +43,11 @@ func (cli *CLI) Run(args []string) int {
 		return 1
 	}
 
-	if in {
+	if attach {
+		// if err := command.Attach(); err != nil {
+		// 	fmt.Fprintln(cli.errStream, err)
+		// 	return 2
+		// }
 	} else if detach {
 		if err := command.Detach(); err != nil {
 			fmt.Fprintln(cli.errStream, err)
@@ -66,6 +71,7 @@ Usage: albio [options]
   A CLI tool to service in/out from AWS Loadbalancer such as ELB/ALB.
 
 Options:
-  --out                   service out
+  --attach                attach the instance from loadbalancer
+  --detach                detach the instance from loadbalancer
   --version, -v           print version
 `
