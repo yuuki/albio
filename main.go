@@ -26,7 +26,7 @@ func (cli *CLI) Run(args []string) int {
 	var (
 		version bool
 		in      bool
-		out     bool
+		detach  bool
 	)
 
 	flags := flag.NewFlagSet(Name, flag.ContinueOnError)
@@ -34,7 +34,7 @@ func (cli *CLI) Run(args []string) int {
 	flags.Usage = func() {
 		fmt.Fprint(cli.errStream, helpText)
 	}
-	flags.BoolVar(&out, "out", false, "")
+	flags.BoolVar(&detach, "detach", false, "")
 	flags.BoolVar(&version, "version", false, "")
 	flags.BoolVar(&version, "v", false, "")
 
@@ -43,7 +43,7 @@ func (cli *CLI) Run(args []string) int {
 	}
 
 	if in {
-	} else if out {
+	} else if detach {
 		if err := command.Detach(); err != nil {
 			fmt.Fprintln(cli.errStream, err)
 			return 2
