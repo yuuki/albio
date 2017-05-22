@@ -49,6 +49,13 @@ func (e *_elb) RemoveInstanceFromLoadBalancers(instanceID string, lbNames []stri
 		if err != nil {
 			return err
 		}
+		err = e.svc.WaitUntilInstanceDeregistered(&goelb.DescribeInstanceHealthInput{
+			Instances:        []*goelb.Instance{&goelb.Instance{InstanceId: aws.String(instanceID)}},
+			LoadBalancerName: aws.String(lbName),
+		})
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
