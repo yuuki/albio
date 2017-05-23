@@ -12,7 +12,8 @@ import (
 
 func Detach() error {
 	sess := session.New()
-	instanceID, err := ec2.New(sess).GetLocalInstanceID()
+	ec2Client := ec2.New(sess)
+	instanceID, err := ec2Client.GetLocalInstanceID()
 	if err != nil {
 		return err
 	}
@@ -24,6 +25,10 @@ func Detach() error {
 	}
 	if len(lbNames) < 1 {
 		return fmt.Errorf("%s is not attached any loadbalancers")
+	}
+
+	if err := ec2Client.SaveLoadBalancersToTag(instanceID, lbNames); err != nil {
+		return err
 	}
 
 	log.Println("-->", "Detaching", instanceID, "from", lbNames)

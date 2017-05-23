@@ -1,14 +1,20 @@
 package ec2
 
 import (
+	"strings"
+
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
 	goec2 "github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 )
 
+const LOAD_BALANCERS_TAG_KEY = "albio-loadbalancers"
+
 type EC2 interface {
 	GetLocalInstanceID() (string, error)
+	SaveLoadBalancersToTag(string, []string) error
 }
 
 type _ec2 struct {
@@ -29,4 +35,18 @@ func (e *_ec2) GetLocalInstanceID() (string, error) {
 		return "", err
 	}
 	return doc.InstanceID, nil
+}
+
+// SaveLoadBalancersToUserdata saves the information of loadbalancers
+// to rejoin into EC2 instance tag.
+// ex. Key: albio-loadbalancers, Value: elb01, elb02
+func (e *_ec2) SaveLoadBalancersToTag(instanceID string, lbNames []string) error {
+	_, err := e.svc.CreateTags(&goec2.CreateTagsInput{
+		Resources: []*string{aws.String(instanceID)},
+		Tags: []*goec2.Tag{&goec2.Tag{
+			Key:   aws.String(LOAD_BALANCERS_TAG_KEY),
+			Value: aws.String(strings.Join(lbNames, ",")),
+		}},
+	})
+	return err
 }
