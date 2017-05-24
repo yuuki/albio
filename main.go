@@ -49,10 +49,10 @@ func (cli *CLI) Run(args []string) int {
 	}
 
 	if attach {
-		// if err := command.Attach(); err != nil {
-		// 	fmt.Fprintln(cli.errStream, err)
-		// 	return 2
-		// }
+		if err := command.Attach(); err != nil {
+			fmt.Fprintln(cli.errStream, err)
+			return 2
+		}
 	} else if detach {
 		if err := command.Detach(); err != nil {
 			fmt.Fprintln(cli.errStream, err)
