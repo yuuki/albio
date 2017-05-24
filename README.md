@@ -4,8 +4,8 @@ albio
 A CLI tool to gracefully manage instances on ELB or ALB.
 
 ```shell
-$ albio --out --execute
+$ albio --detach
 $ # something restart command
-$ albio --in --execute
+$ albio --attach
 ```
 
