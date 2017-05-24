@@ -9,6 +9,7 @@ import (
 
 type ELB interface {
 	GetLoadBalancersFromInstanceID(string) ([]string, error)
+	AddInstanceToLoadBalancers(string, []string) error
 	RemoveInstanceFromLoadBalancers(string, []string) error
 }
 
@@ -36,6 +37,28 @@ func (e *_elb) GetLoadBalancersFromInstanceID(instanceID string) ([]string, erro
 		}
 	}
 	return lbNames, nil
+}
+
+func (e *_elb) AddInstanceToLoadBalancers(instanceID string, lbNames []string) error {
+	for _, lbName := range lbNames {
+		_, err := e.svc.RegisterInstancesWithLoadBalancer(
+			&goelb.RegisterInstancesWithLoadBalancerInput{
+				Instances:        []*goelb.Instance{{InstanceId: aws.String(instanceID)}},
+				LoadBalancerName: aws.String(lbName),
+			},
+		)
+		if err != nil {
+			return err
+		}
+		err = e.svc.WaitUntilInstanceInService(&goelb.DescribeInstanceHealthInput{
+			Instances:        []*goelb.Instance{&goelb.Instance{InstanceId: aws.String(instanceID)}},
+			LoadBalancerName: aws.String(lbName),
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (e *_elb) RemoveInstanceFromLoadBalancers(instanceID string, lbNames []string) error {
