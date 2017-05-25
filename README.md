@@ -9,3 +9,10 @@ $ # something restart command
 $ albio --attach
 ```
 
+## License
+
+[The MIT License](./LICENSE).
+
+## Author
+
+[y_uuki](https://github.com/yuuki)
