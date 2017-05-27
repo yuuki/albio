@@ -14,7 +14,7 @@ const LOAD_BALANCERS_TAG_KEY = "albio-loadbalancers"
 
 type EC2 interface {
 	GetLocalInstanceID() (string, error)
-	GetLoadBalancersFromTag(string) ([]string, error)
+	GetLoadBalancerNamesFromTag(string) ([]string, error)
 	SaveLoadBalancersToTag(string, []string) error
 }
 
@@ -40,7 +40,7 @@ func (e *_ec2) GetLocalInstanceID() (string, error) {
 
 // GetLoadBalancersFromTag gets the information of loadbalancers that
 // saves by SaveLoadBalancersToTag.
-func (e *_ec2) GetLoadBalancersFromTag(instanceID string) ([]string, error) {
+func (e *_ec2) GetLoadBalancerNamesFromTag(instanceID string) ([]string, error) {
 	resp, err := e.svc.DescribeTags(&goec2.DescribeTagsInput{
 		Filters: []*goec2.Filter{
 			&goec2.Filter{Name: aws.String("resource-id"), Values: []*string{aws.String(instanceID)}},
@@ -59,7 +59,6 @@ func (e *_ec2) GetLoadBalancersFromTag(instanceID string) ([]string, error) {
 	for _, name := range strings.Split(*resp.Tags[0].Value, ",") {
 		lbNames = append(lbNames, name)
 	}
-
 	return lbNames, nil
 }
 

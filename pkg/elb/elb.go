@@ -5,12 +5,14 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	goelb "github.com/aws/aws-sdk-go/service/elb"
 	"github.com/aws/aws-sdk-go/service/elb/elbiface"
+	"github.com/yuuki/albio/pkg/model"
 )
 
 type ELB interface {
-	GetLoadBalancersFromInstanceID(string) ([]string, error)
-	AddInstanceToLoadBalancers(string, []string) error
-	RemoveInstanceFromLoadBalancers(string, []string) error
+	GetLoadBalancersFromInstanceID(string) ([]*model.LoadBalancer, error)
+	GetLoadBalancersByNames([]string) ([]*model.LoadBalancer, error)
+	AddInstanceToLoadBalancers(string, []*model.LoadBalancer) error
+	RemoveInstanceFromLoadBalancers(string, []*model.LoadBalancer) error
 }
 
 type _elb struct {
@@ -23,28 +25,46 @@ func New(sess *session.Session) ELB {
 	}
 }
 
-func (e *_elb) GetLoadBalancersFromInstanceID(instanceID string) ([]string, error) {
+func (e *_elb) GetLoadBalancersFromInstanceID(instanceID string) ([]*model.LoadBalancer, error) {
 	resp, err := e.svc.DescribeLoadBalancers(&goelb.DescribeLoadBalancersInput{})
 	if err != nil {
 		return nil, err
 	}
-	var lbNames []string
-	for _, lb := range resp.LoadBalancerDescriptions {
-		for _, instance := range lb.Instances {
+	var lbs []*model.LoadBalancer
+	for _, lbdesc := range resp.LoadBalancerDescriptions {
+		for _, instance := range lbdesc.Instances {
 			if *instance.InstanceId == instanceID {
-				lbNames = append(lbNames, *lb.LoadBalancerName)
+				lbs = append(lbs, model.NewLoadBalancer(lbdesc))
 			}
 		}
 	}
-	return lbNames, nil
+	return lbs, nil
 }
 
-func (e *_elb) AddInstanceToLoadBalancers(instanceID string, lbNames []string) error {
-	for _, lbName := range lbNames {
+func (e *_elb) GetLoadBalancersByNames(lbNames []string) ([]*model.LoadBalancer, error) {
+	names := make([]*string, 0, len(lbNames))
+	for _, n := range lbNames {
+		names = append(names, &n)
+	}
+	resp, err := e.svc.DescribeLoadBalancers(&goelb.DescribeLoadBalancersInput{
+		LoadBalancerNames: names,
+	})
+	if err != nil {
+		return nil, err
+	}
+	var lbs []*model.LoadBalancer
+	for _, lbdesc := range resp.LoadBalancerDescriptions {
+		lbs = append(lbs, model.NewLoadBalancer(lbdesc))
+	}
+	return lbs, nil
+}
+
+func (e *_elb) AddInstanceToLoadBalancers(instanceID string, lbs []*model.LoadBalancer) error {
+	for _, lb := range lbs {
 		_, err := e.svc.RegisterInstancesWithLoadBalancer(
 			&goelb.RegisterInstancesWithLoadBalancerInput{
 				Instances:        []*goelb.Instance{{InstanceId: aws.String(instanceID)}},
-				LoadBalancerName: aws.String(lbName),
+				LoadBalancerName: aws.String(lb.Name),
 			},
 		)
 		if err != nil {
@@ -52,7 +72,7 @@ func (e *_elb) AddInstanceToLoadBalancers(instanceID string, lbNames []string) e
 		}
 		err = e.svc.WaitUntilInstanceInService(&goelb.DescribeInstanceHealthInput{
 			Instances:        []*goelb.Instance{&goelb.Instance{InstanceId: aws.String(instanceID)}},
-			LoadBalancerName: aws.String(lbName),
+			LoadBalancerName: aws.String(lb.Name),
 		})
 		if err != nil {
 			return err
@@ -61,12 +81,12 @@ func (e *_elb) AddInstanceToLoadBalancers(instanceID string, lbNames []string) e
 	return nil
 }
 
-func (e *_elb) RemoveInstanceFromLoadBalancers(instanceID string, lbNames []string) error {
-	for _, lbName := range lbNames {
+func (e *_elb) RemoveInstanceFromLoadBalancers(instanceID string, lbs []*model.LoadBalancer) error {
+	for _, lb := range lbs {
 		_, err := e.svc.DeregisterInstancesFromLoadBalancer(
 			&goelb.DeregisterInstancesFromLoadBalancerInput{
 				Instances:        []*goelb.Instance{{InstanceId: aws.String(instanceID)}},
-				LoadBalancerName: aws.String(lbName),
+				LoadBalancerName: aws.String(lb.Name),
 			},
 		)
 		if err != nil {
@@ -74,7 +94,7 @@ func (e *_elb) RemoveInstanceFromLoadBalancers(instanceID string, lbNames []stri
 		}
 		err = e.svc.WaitUntilInstanceDeregistered(&goelb.DescribeInstanceHealthInput{
 			Instances:        []*goelb.Instance{&goelb.Instance{InstanceId: aws.String(instanceID)}},
-			LoadBalancerName: aws.String(lbName),
+			LoadBalancerName: aws.String(lb.Name),
 		})
 		if err != nil {
 			return err

@@ -17,7 +17,7 @@ func Attach() error {
 		return err
 	}
 
-	lbNames, err := ec2Client.GetLoadBalancersFromTag(instanceID)
+	lbNames, err := ec2Client.GetLoadBalancerNamesFromTag(instanceID)
 	if err != nil {
 		return err
 	}
@@ -27,8 +27,14 @@ func Attach() error {
 	}
 
 	lbClient := elb.New(sess)
-	log.Println("-->", "Attaching", instanceID, "to", lbNames)
-	if err := lbClient.AddInstanceToLoadBalancers(instanceID, lbNames); err != nil {
+
+	lbs, err := lbClient.GetLoadBalancersByNames(lbNames)
+	if err != nil {
+		return err
+	}
+
+	log.Println("-->", "Attaching", instanceID, "to", lbs)
+	if err := lbClient.AddInstanceToLoadBalancers(instanceID, lbs); err != nil {
 		return err
 	}
 

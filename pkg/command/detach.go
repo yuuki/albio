@@ -19,20 +19,24 @@ func Detach() error {
 	}
 
 	lbClient := elb.New(sess)
-	lbNames, err := lbClient.GetLoadBalancersFromInstanceID(instanceID)
+	lbs, err := lbClient.GetLoadBalancersFromInstanceID(instanceID)
 	if err != nil {
 		return err
 	}
-	if len(lbNames) < 1 {
+	if len(lbs) < 1 {
 		return fmt.Errorf("%s is not attached any loadbalancers")
 	}
 
+	lbNames := make([]string, 0, len(lbs))
+	for _, n := range lbs {
+		lbNames = append(lbNames, n.Name)
+	}
 	if err := ec2Client.SaveLoadBalancersToTag(instanceID, lbNames); err != nil {
 		return err
 	}
 
-	log.Println("-->", "Detaching", instanceID, "from", lbNames)
-	if err := lbClient.RemoveInstanceFromLoadBalancers(instanceID, lbNames); err != nil {
+	log.Println("-->", "Detaching", instanceID, "from", lbs)
+	if err := lbClient.RemoveInstanceFromLoadBalancers(instanceID, lbs); err != nil {
 		return err
 	}
 
