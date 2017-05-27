@@ -1,8 +1,27 @@
 package model
 
 import (
+	"strings"
+
 	goelb "github.com/aws/aws-sdk-go/service/elb"
 )
+
+// LoadBalancers represents an slice of loadbalancer.
+type LoadBalancers []*LoadBalancer
+
+// String returns a string reprentation of LoadBalancers.
+func (lbs LoadBalancers) String() string {
+	return strings.Join(lbs.NameSlice(), ",")
+}
+
+// NameSlice returns a slice of loadbalancer's name.
+func (lbs LoadBalancers) NameSlice() []string {
+	names := make([]string, 0, len(lbs))
+	for _, lb := range lbs {
+		names = append(names, lb.Name)
+	}
+	return names
+}
 
 // LoadBalancer represents a loadbalancer.
 type LoadBalancer struct {

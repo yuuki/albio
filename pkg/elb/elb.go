@@ -9,10 +9,10 @@ import (
 )
 
 type ELB interface {
-	GetLoadBalancersFromInstanceID(string) ([]*model.LoadBalancer, error)
-	GetLoadBalancersByNames([]string) ([]*model.LoadBalancer, error)
-	AddInstanceToLoadBalancers(string, []*model.LoadBalancer) error
-	RemoveInstanceFromLoadBalancers(string, []*model.LoadBalancer) error
+	GetLoadBalancersFromInstanceID(string) (model.LoadBalancers, error)
+	GetLoadBalancersByNames([]string) (model.LoadBalancers, error)
+	AddInstanceToLoadBalancers(string, model.LoadBalancers) error
+	RemoveInstanceFromLoadBalancers(string, model.LoadBalancers) error
 }
 
 type _elb struct {
@@ -25,12 +25,12 @@ func New(sess *session.Session) ELB {
 	}
 }
 
-func (e *_elb) GetLoadBalancersFromInstanceID(instanceID string) ([]*model.LoadBalancer, error) {
+func (e *_elb) GetLoadBalancersFromInstanceID(instanceID string) (model.LoadBalancers, error) {
 	resp, err := e.svc.DescribeLoadBalancers(&goelb.DescribeLoadBalancersInput{})
 	if err != nil {
 		return nil, err
 	}
-	var lbs []*model.LoadBalancer
+	var lbs model.LoadBalancers
 	for _, lbdesc := range resp.LoadBalancerDescriptions {
 		for _, instance := range lbdesc.Instances {
 			if *instance.InstanceId == instanceID {
@@ -41,7 +41,7 @@ func (e *_elb) GetLoadBalancersFromInstanceID(instanceID string) ([]*model.LoadB
 	return lbs, nil
 }
 
-func (e *_elb) GetLoadBalancersByNames(lbNames []string) ([]*model.LoadBalancer, error) {
+func (e *_elb) GetLoadBalancersByNames(lbNames []string) (model.LoadBalancers, error) {
 	names := make([]*string, 0, len(lbNames))
 	for _, n := range lbNames {
 		names = append(names, &n)
@@ -52,14 +52,14 @@ func (e *_elb) GetLoadBalancersByNames(lbNames []string) ([]*model.LoadBalancer,
 	if err != nil {
 		return nil, err
 	}
-	var lbs []*model.LoadBalancer
+	var lbs model.LoadBalancers
 	for _, lbdesc := range resp.LoadBalancerDescriptions {
 		lbs = append(lbs, model.NewLoadBalancer(lbdesc))
 	}
 	return lbs, nil
 }
 
-func (e *_elb) AddInstanceToLoadBalancers(instanceID string, lbs []*model.LoadBalancer) error {
+func (e *_elb) AddInstanceToLoadBalancers(instanceID string, lbs model.LoadBalancers) error {
 	for _, lb := range lbs {
 		_, err := e.svc.RegisterInstancesWithLoadBalancer(
 			&goelb.RegisterInstancesWithLoadBalancerInput{
@@ -81,7 +81,7 @@ func (e *_elb) AddInstanceToLoadBalancers(instanceID string, lbs []*model.LoadBa
 	return nil
 }
 
-func (e *_elb) RemoveInstanceFromLoadBalancers(instanceID string, lbs []*model.LoadBalancer) error {
+func (e *_elb) RemoveInstanceFromLoadBalancers(instanceID string, lbs model.LoadBalancers) error {
 	for _, lb := range lbs {
 		_, err := e.svc.DeregisterInstancesFromLoadBalancer(
 			&goelb.DeregisterInstancesFromLoadBalancerInput{

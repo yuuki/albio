@@ -27,11 +27,7 @@ func Detach() error {
 		return fmt.Errorf("%s is not attached any loadbalancers")
 	}
 
-	lbNames := make([]string, 0, len(lbs))
-	for _, n := range lbs {
-		lbNames = append(lbNames, n.Name)
-	}
-	if err := ec2Client.SaveLoadBalancersToTag(instanceID, lbNames); err != nil {
+	if err := ec2Client.SaveLoadBalancersToTag(instanceID, lbs.NameSlice()); err != nil {
 		return err
 	}
 
