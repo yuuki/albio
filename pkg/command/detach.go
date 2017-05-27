@@ -10,7 +10,7 @@ import (
 	"github.com/yuuki/albio/pkg/elb"
 )
 
-func Detach(args []string) error {
+func Detach() error {
 	sess := session.New()
 	ec2Client := ec2.New(sess)
 	instanceID, err := ec2Client.GetLocalInstanceID()

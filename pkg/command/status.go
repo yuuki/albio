@@ -10,7 +10,7 @@ import (
 	"github.com/yuuki/albio/pkg/elb"
 )
 
-func Status(args []string) error {
+func Status() error {
 	sess := session.New()
 	instanceID, err := ec2.New(sess).GetLocalInstanceID()
 	if err != nil {

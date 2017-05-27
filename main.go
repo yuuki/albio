@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -31,11 +32,11 @@ func (cli *CLI) Run(args []string) int {
 
 	switch args[1] {
 	case "status":
-		err = command.Status(args[2:])
+		err = cli.doStatus(args[2:])
 	case "attach":
-		err = command.Attach(args[2:])
+		err = cli.doAttach(args[2:])
 	case "detach":
-		err = command.Detach(args[2:])
+		err = cli.doDetach(args[2:])
 	case "-v", "--version":
 		fmt.Fprintf(cli.errStream, "%s version %s, build %s \n", Name, Version, GitCommit)
 		return 0
@@ -67,3 +68,39 @@ Options:
   --version, -v		print version
   --help, -h            print help
 `
+
+func (cli *CLI) doStatus(args []string) error {
+	flags := flag.NewFlagSet(Name, flag.ContinueOnError)
+	flags.SetOutput(cli.errStream)
+	flags.Usage = func() {
+		fmt.Fprint(cli.errStream, helpText)
+	}
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	return command.Status()
+}
+
+func (cli *CLI) doAttach(args []string) error {
+	flags := flag.NewFlagSet(Name, flag.ContinueOnError)
+	flags.SetOutput(cli.errStream)
+	flags.Usage = func() {
+		fmt.Fprint(cli.errStream, helpText)
+	}
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	return command.Attach()
+}
+
+func (cli *CLI) doDetach(args []string) error {
+	flags := flag.NewFlagSet(Name, flag.ContinueOnError)
+	flags.SetOutput(cli.errStream)
+	flags.Usage = func() {
+		fmt.Fprint(cli.errStream, helpText)
+	}
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	return command.Detach()
+}
