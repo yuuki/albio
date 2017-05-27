@@ -9,6 +9,28 @@ import (
 // LoadBalancers represents an slice of loadbalancer.
 type LoadBalancers []*LoadBalancer
 
+// NewLoadBalancers creates the object of LoadBalancers from the slice of elb.LoadBalancerDescription.
+func NewLoadBalancers(descs []*goelb.LoadBalancerDescription) LoadBalancers {
+	var lbs LoadBalancers
+	for _, desc := range descs {
+		lbs = append(lbs, NewLoadBalancer(desc))
+	}
+	return lbs
+}
+
+// NewLoadBalancersByInstanceID creates the object of LoadBalancers from elb.LoadBalancerDescription.
+func NewLoadBalancersByInstanceID(descs []*goelb.LoadBalancerDescription, instanceID string) LoadBalancers {
+	var lbs LoadBalancers
+	for _, desc := range descs {
+		for _, instance := range desc.Instances {
+			if *instance.InstanceId == instanceID {
+				lbs = append(lbs, NewLoadBalancer(desc))
+			}
+		}
+	}
+	return lbs
+}
+
 // String returns a string reprentation of LoadBalancers.
 func (lbs LoadBalancers) String() string {
 	return strings.Join(lbs.NameSlice(), ",")

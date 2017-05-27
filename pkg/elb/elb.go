@@ -30,15 +30,7 @@ func (e *_elb) GetLoadBalancersFromInstanceID(instanceID string) (model.LoadBala
 	if err != nil {
 		return nil, err
 	}
-	var lbs model.LoadBalancers
-	for _, lbdesc := range resp.LoadBalancerDescriptions {
-		for _, instance := range lbdesc.Instances {
-			if *instance.InstanceId == instanceID {
-				lbs = append(lbs, model.NewLoadBalancer(lbdesc))
-			}
-		}
-	}
-	return lbs, nil
+	return model.NewLoadBalancersByInstanceID(resp.LoadBalancerDescriptions, instanceID), nil
 }
 
 func (e *_elb) GetLoadBalancersByNames(lbNames []string) (model.LoadBalancers, error) {
@@ -52,11 +44,7 @@ func (e *_elb) GetLoadBalancersByNames(lbNames []string) (model.LoadBalancers, e
 	if err != nil {
 		return nil, err
 	}
-	var lbs model.LoadBalancers
-	for _, lbdesc := range resp.LoadBalancerDescriptions {
-		lbs = append(lbs, model.NewLoadBalancer(lbdesc))
-	}
-	return lbs, nil
+	return model.NewLoadBalancers(resp.LoadBalancerDescriptions), nil
 }
 
 func (e *_elb) AddInstanceToLoadBalancers(instanceID string, lbs model.LoadBalancers) error {
