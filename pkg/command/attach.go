@@ -9,7 +9,7 @@ import (
 	"github.com/yuuki/albio/pkg/elb"
 )
 
-func Attach() error {
+func Attach(args []string) error {
 	sess := session.New()
 	ec2Client := ec2.New(sess)
 	instanceID, err := ec2Client.GetLocalInstanceID()
