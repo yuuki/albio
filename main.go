@@ -69,12 +69,17 @@ Options:
   --help, -h            print help
 `
 
-func (cli *CLI) doStatus(args []string) error {
+func (cli *CLI) prepareFlags(help string) *flag.FlagSet {
 	flags := flag.NewFlagSet(Name, flag.ContinueOnError)
 	flags.SetOutput(cli.errStream)
 	flags.Usage = func() {
-		fmt.Fprint(cli.errStream, helpText)
+		fmt.Fprint(cli.errStream, help)
 	}
+	return flags
+}
+
+func (cli *CLI) doStatus(args []string) error {
+	flags := cli.prepareFlags(helpText)
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
@@ -82,11 +87,7 @@ func (cli *CLI) doStatus(args []string) error {
 }
 
 func (cli *CLI) doAttach(args []string) error {
-	flags := flag.NewFlagSet(Name, flag.ContinueOnError)
-	flags.SetOutput(cli.errStream)
-	flags.Usage = func() {
-		fmt.Fprint(cli.errStream, helpText)
-	}
+	flags := cli.prepareFlags(helpText)
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
@@ -94,11 +95,7 @@ func (cli *CLI) doAttach(args []string) error {
 }
 
 func (cli *CLI) doDetach(args []string) error {
-	flags := flag.NewFlagSet(Name, flag.ContinueOnError)
-	flags.SetOutput(cli.errStream)
-	flags.Usage = func() {
-		fmt.Fprint(cli.errStream, helpText)
-	}
+	flags := cli.prepareFlags(helpText)
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
