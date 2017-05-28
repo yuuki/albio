@@ -24,9 +24,11 @@ type _ec2 struct {
 }
 
 func New(sess *session.Session) EC2 {
+	mdSvc := ec2metadata.New(sess)
+	region, _ := mdSvc.Region()
 	return &_ec2{
-		svc:         goec2.New(sess),
-		metadataSvc: ec2metadata.New(sess),
+		svc:         goec2.New(sess, aws.NewConfig().WithRegion(region)),
+		metadataSvc: mdSvc,
 	}
 }
 

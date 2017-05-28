@@ -2,6 +2,7 @@ package elb
 
 import (
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
 	goelb "github.com/aws/aws-sdk-go/service/elb"
 	"github.com/aws/aws-sdk-go/service/elb/elbiface"
@@ -20,8 +21,9 @@ type _elb struct {
 }
 
 func New(sess *session.Session) ELB {
+	region, _ := ec2metadata.New(sess).Region()
 	return &_elb{
-		svc: goelb.New(sess),
+		svc: goelb.New(sess, aws.NewConfig().WithRegion(region)),
 	}
 }
 
