@@ -1,6 +1,8 @@
 package elb
 
 import (
+	"os"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -21,7 +23,10 @@ type _elb struct {
 }
 
 func New(sess *session.Session) ELB {
-	region, _ := ec2metadata.New(sess).Region()
+	region := os.Getenv("AWS_REGION")
+	if region == "" {
+		region, _ = ec2metadata.New(sess).Region()
+	}
 	return &_elb{
 		svc: goelb.New(sess, aws.NewConfig().WithRegion(region)),
 	}
