@@ -10,11 +10,20 @@ import (
 	"github.com/yuuki/albio/pkg/elb"
 )
 
-func Status() error {
+type StatusParam struct {
+	InstanceID string
+}
+
+func Status(param *StatusParam) error {
 	sess := session.New()
-	instanceID, err := ec2.New(sess).GetLocalInstanceID()
-	if err != nil {
-		return err
+
+	var instanceID string
+	if param.InstanceID == "" {
+		var err error
+		instanceID, err = ec2.New(sess).GetLocalInstanceID()
+		if err != nil {
+			return err
+		}
 	}
 
 	lbs, err := elb.New(sess).GetLoadBalancersFromInstanceID(instanceID)

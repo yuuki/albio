@@ -78,12 +78,24 @@ func (cli *CLI) prepareFlags(help string) *flag.FlagSet {
 	return flags
 }
 
+var statusHelpText = `
+Usage: albio status [options]
+
+show loadbalancers information.
+
+Options:
+  --instance-id, -i	specify EC2 instance id
+`
+
 func (cli *CLI) doStatus(args []string) error {
-	flags := cli.prepareFlags(helpText)
+	var param command.StatusParam
+	flags := cli.prepareFlags(statusHelpText)
+	flags.StringVar(&param.InstanceID, "i", "", "")
+	flags.StringVar(&param.InstanceID, "instance-id", "", "")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
-	return command.Status()
+	return command.Status(&param)
 }
 
 func (cli *CLI) doAttach(args []string) error {
