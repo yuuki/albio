@@ -9,12 +9,21 @@ import (
 	"github.com/yuuki/albio/pkg/elb"
 )
 
-func Attach() error {
+type AttachParam struct {
+	InstanceID string
+}
+
+func Attach(param *AttachParam) error {
 	sess := session.New()
 	ec2Client := ec2.New(sess)
-	instanceID, err := ec2Client.GetLocalInstanceID()
-	if err != nil {
-		return err
+
+	var instanceID string
+	if param.InstanceID == "" {
+		var err error
+		instanceID, err = ec2Client.GetLocalInstanceID()
+		if err != nil {
+			return err
+		}
 	}
 
 	lbNames, err := ec2Client.GetLoadBalancerNamesFromTag(instanceID)
