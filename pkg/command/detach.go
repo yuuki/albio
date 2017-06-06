@@ -10,12 +10,21 @@ import (
 	"github.com/yuuki/albio/pkg/elb"
 )
 
-func Detach() error {
+type DetachParam struct {
+	InstanceID string
+}
+
+func Detach(param *DetachParam) error {
 	sess := session.New()
 	ec2Client := ec2.New(sess)
-	instanceID, err := ec2Client.GetLocalInstanceID()
-	if err != nil {
-		return err
+
+	var instanceID string
+	if param.InstanceID == "" {
+		var err error
+		instanceID, err = ec2Client.GetLocalInstanceID()
+		if err != nil {
+			return err
+		}
 	}
 
 	lbClient := elb.New(sess)

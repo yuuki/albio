@@ -98,18 +98,42 @@ func (cli *CLI) doStatus(args []string) error {
 	return command.Status(&param)
 }
 
+var attachHelpText = `
+Usage: albio attach [options]
+
+attach loadbalancers to the EC2 instance.
+
+Options:
+  --instance-id, -i	specify EC2 instance id
+`
+
 func (cli *CLI) doAttach(args []string) error {
-	flags := cli.prepareFlags(helpText)
+	var param command.AttachParam
+	flags := cli.prepareFlags(attachHelpText)
+	flags.StringVar(&param.InstanceID, "i", "", "")
+	flags.StringVar(&param.InstanceID, "instance-id", "", "")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
-	return command.Attach()
+	return command.Attach(&param)
 }
 
+var detachHelpText = `
+Usage: albio detach [options]
+
+detach loadbalancers from the EC2 instance.
+
+Options:
+  --instance-id, -i	specify EC2 instance id
+`
+
 func (cli *CLI) doDetach(args []string) error {
-	flags := cli.prepareFlags(helpText)
+	var param command.DetachParam
+	flags := cli.prepareFlags(detachHelpText)
+	flags.StringVar(&param.InstanceID, "i", "", "")
+	flags.StringVar(&param.InstanceID, "instance-id", "", "")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
-	return command.Detach()
+	return command.Detach(&param)
 }
