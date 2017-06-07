@@ -44,6 +44,7 @@ func (cli *CLI) Run(args []string) int {
 		fmt.Fprint(cli.errStream, helpText)
 	default:
 		fmt.Fprint(cli.errStream, helpText)
+		return 1
 	}
 
 	if err != nil {

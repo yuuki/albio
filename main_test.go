@@ -33,7 +33,7 @@ func TestRun_parseError(t *testing.T) {
 		t.Errorf("expected %d to eq %d", status, 1)
 	}
 
-	expected := "flag provided but not defined"
+	expected := "Usage: albio"
 	if !strings.Contains(errStream.String(), expected) {
 		t.Fatalf("expected %q to contain %q", errStream.String(), expected)
 	}
