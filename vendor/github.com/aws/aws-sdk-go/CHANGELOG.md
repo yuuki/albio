@@ -1,4 +1,15 @@
-Release v1.9.44 (2017-06-19)
+Release v1.10.0 (2017-06-20)
+===
+
+### Service Client Updates
+* `service/workdocs`: Updates service API and documentation
+  * This release provides a new API to retrieve the activities performed by WorkDocs users.
+
+### SDK Features
+* `aws/credentials/plugincreds`: Add support for Go plugin for credentials [#1320](https://github.com/aws/aws-sdk-go/pull/1320)
+  * Adds support for using plugins to retrieve credentials for API requests. This change adds a new package plugincreds under aws/credentials. See the `example/aws/credentials/plugincreds` folder in the SDK for example usage.
+
+Release v1.9.00 (2017-06-19)
 ===
 
 ### Service Client Updates
