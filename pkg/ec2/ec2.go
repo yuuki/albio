@@ -19,9 +19,15 @@ type EC2 interface {
 	SaveLoadBalancersToTag(string, []string) error
 }
 
+// EC2MetadataAPI defines the interface for EC2Metadata stubbing.
+type EC2MetadataAPI interface {
+	Region() (string, error)
+	GetInstanceIdentityDocument() (ec2metadata.EC2InstanceIdentityDocument, error)
+}
+
 type _ec2 struct {
 	svc         ec2iface.EC2API
-	metadataSvc *ec2metadata.EC2Metadata // TODO interface
+	metadataSvc EC2MetadataAPI
 }
 
 func New(sess *session.Session) EC2 {
@@ -36,6 +42,7 @@ func New(sess *session.Session) EC2 {
 	}
 }
 
+// GetLocalInstanceID gets an ID of local EC2 instance from EC2 metadata.
 func (e *_ec2) GetLocalInstanceID() (string, error) {
 	doc, err := e.metadataSvc.GetInstanceIdentityDocument()
 	if err != nil {
