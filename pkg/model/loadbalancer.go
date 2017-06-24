@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	goelb "github.com/aws/aws-sdk-go/service/elb"
+	"github.com/aws/aws-sdk-go/service/elbv2"
 )
 
 // LoadBalancers represents an slice of loadbalancer.
@@ -29,6 +30,17 @@ func NewLoadBalancersByInstanceID(descs []*goelb.LoadBalancerDescription, instan
 		}
 	}
 	return lbs
+}
+
+// NewLoadBalancersFromALB creates the object of LoadBalancers from ALB.
+func NewLoadBalancersFromALB(output *elbv2.DescribeLoadBalancersOutput,
+	loadBalancerArnToTargets map[string][]*elbv2.TargetDescription) LoadBalancers {
+	models := make(LoadBalancers, 0, len(output.LoadBalancers))
+	for _, lb := range output.LoadBalancers {
+		targets := loadBalancerArnToTargets[*lb.LoadBalancerArn]
+		models = append(models, NewLoadBalancerFromALB(lb, targets))
+	}
+	return models
 }
 
 // String returns a string reprentation of LoadBalancers.
@@ -57,6 +69,18 @@ func NewLoadBalancer(desc *goelb.LoadBalancerDescription) *LoadBalancer {
 	instances := make([]*Instance, 0, len(desc.Instances))
 	for _, instance := range desc.Instances {
 		instances = append(instances, NewInstance(instance))
+	}
+	return &LoadBalancer{
+		Name:      *desc.LoadBalancerName,
+		DNSName:   *desc.DNSName,
+		Instances: instances,
+	}
+}
+
+func NewLoadBalancerFromALB(desc *elbv2.LoadBalancer, targets []*elbv2.TargetDescription) *LoadBalancer {
+	instances := make([]*Instance, 0, len(targets))
+	for _, target := range targets {
+		instances = append(instances, NewInstanceFromTarget(target))
 	}
 	return &LoadBalancer{
 		Name:      *desc.LoadBalancerName,
