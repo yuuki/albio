@@ -33,7 +33,7 @@ func Detach(param *DetachParam) error {
 		return err
 	}
 	if len(lbs) < 1 {
-		return fmt.Errorf("%s is not attached any loadbalancers")
+		return fmt.Errorf("%v is not attached any loadbalancers", instanceID)
 	}
 
 	if err := ec2Client.SaveLoadBalancersToTag(instanceID, lbs.NameSlice()); err != nil {

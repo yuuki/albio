@@ -9,5 +9,9 @@ build:
 	go build -ldflags "-X main.GitCommit=\"$(COMMIT)\"" $(PKG)
 
 .PHONY: test
-test:
+test: vet
 	go test -v $(PKGS)
+
+.PHONY: vet
+vet:
+	go vet $(PKGS)
