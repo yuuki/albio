@@ -7,7 +7,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
 	goelb "github.com/aws/aws-sdk-go/service/elb"
-	"github.com/aws/aws-sdk-go/service/elb/elbiface"
 	"github.com/yuuki/albio/pkg/model"
 )
 
@@ -18,8 +17,16 @@ type ELB interface {
 	RemoveInstanceFromLoadBalancers(string, model.LoadBalancers) error
 }
 
+type ELBAPI interface {
+	DescribeLoadBalancers(*goelb.DescribeLoadBalancersInput) (*goelb.DescribeLoadBalancersOutput, error)
+	RegisterInstancesWithLoadBalancer(*goelb.RegisterInstancesWithLoadBalancerInput) (*goelb.RegisterInstancesWithLoadBalancerOutput, error)
+	WaitUntilInstanceInService(*goelb.DescribeInstanceHealthInput) error
+	DeregisterInstancesFromLoadBalancer(*goelb.DeregisterInstancesFromLoadBalancerInput) (*goelb.DeregisterInstancesFromLoadBalancerOutput, error)
+	WaitUntilInstanceDeregistered(*goelb.DescribeInstanceHealthInput) error
+}
+
 type _elb struct {
-	svc elbiface.ELBAPI
+	svc ELBAPI
 }
 
 func New(sess *session.Session) ELB {
@@ -43,7 +50,7 @@ func (e *_elb) GetLoadBalancersFromInstanceID(instanceID string) (model.LoadBala
 func (e *_elb) GetLoadBalancersByNames(lbNames []string) (model.LoadBalancers, error) {
 	names := make([]*string, 0, len(lbNames))
 	for _, n := range lbNames {
-		names = append(names, &n)
+		names = append(names, aws.String(n))
 	}
 	resp, err := e.svc.DescribeLoadBalancers(&goelb.DescribeLoadBalancersInput{
 		LoadBalancerNames: names,
