@@ -1,4 +1,4 @@
-package ec2
+package awsapi
 
 import (
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"

@@ -7,11 +7,12 @@ import (
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	goec2 "github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/kylelemons/godebug/pretty"
+	"github.com/yuuki/albio/pkg/awsapi"
 )
 
 func TestGetLocalInstanceID(t *testing.T) {
 	obj := &_ec2{
-		metadataSvc: &FakeEC2Metadata{
+		metadataSvc: &awsapi.FakeEC2Metadata{
 			FakeRegion: func() (string, error) {
 				return "ap-northeast-1", nil
 			},
@@ -30,7 +31,7 @@ func TestGetLocalInstanceID(t *testing.T) {
 }
 
 func TestGetLoadBalancerNamesFromTag(t *testing.T) {
-	fakeSvc := &FakeEC2API{
+	fakeSvc := &awsapi.FakeEC2API{
 		FakeDescribeTags: func(input *goec2.DescribeTagsInput) (*goec2.DescribeTagsOutput, error) {
 			return &goec2.DescribeTagsOutput{
 				Tags: []*goec2.TagDescription{
@@ -54,7 +55,7 @@ func TestGetLoadBalancerNamesFromTag(t *testing.T) {
 }
 
 func TestSaveLoadBalancersToTag(t *testing.T) {
-	fakeSvc := &FakeEC2API{
+	fakeSvc := &awsapi.FakeEC2API{
 		FakeCreateTags: func(input *goec2.CreateTagsInput) (*goec2.CreateTagsOutput, error) {
 			expectedResources := []*string{aws.String("instanceid")}
 			if diff := pretty.Compare(input.Resources, expectedResources); diff != "" {

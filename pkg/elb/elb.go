@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
 	goelb "github.com/aws/aws-sdk-go/service/elb"
+	"github.com/yuuki/albio/pkg/awsapi"
 	"github.com/yuuki/albio/pkg/model"
 )
 
@@ -17,16 +18,8 @@ type ELB interface {
 	RemoveInstanceFromLoadBalancers(string, model.LoadBalancers) error
 }
 
-type ELBAPI interface {
-	DescribeLoadBalancers(*goelb.DescribeLoadBalancersInput) (*goelb.DescribeLoadBalancersOutput, error)
-	RegisterInstancesWithLoadBalancer(*goelb.RegisterInstancesWithLoadBalancerInput) (*goelb.RegisterInstancesWithLoadBalancerOutput, error)
-	WaitUntilInstanceInService(*goelb.DescribeInstanceHealthInput) error
-	DeregisterInstancesFromLoadBalancer(*goelb.DeregisterInstancesFromLoadBalancerInput) (*goelb.DeregisterInstancesFromLoadBalancerOutput, error)
-	WaitUntilInstanceDeregistered(*goelb.DescribeInstanceHealthInput) error
-}
-
 type _elb struct {
-	svc ELBAPI
+	svc awsapi.ELBAPI
 }
 
 func New(sess *session.Session) ELB {

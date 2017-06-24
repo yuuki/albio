@@ -6,11 +6,12 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	goelb "github.com/aws/aws-sdk-go/service/elb"
 	"github.com/kylelemons/godebug/pretty"
+	"github.com/yuuki/albio/pkg/awsapi"
 	"github.com/yuuki/albio/pkg/model"
 )
 
 func TestGetLoadBalancersFromInstanceID(t *testing.T) {
-	fakeSvc := &FakeELBAPI{
+	fakeSvc := &awsapi.FakeELBAPI{
 		FakeDescribeLoadBalancers: func(input *goelb.DescribeLoadBalancersInput) (*goelb.DescribeLoadBalancersOutput, error) {
 			return &goelb.DescribeLoadBalancersOutput{
 				LoadBalancerDescriptions: []*goelb.LoadBalancerDescription{
@@ -71,7 +72,7 @@ func TestGetLoadBalancersFromInstanceID(t *testing.T) {
 }
 
 func TestGetLoadBalancersByNames(t *testing.T) {
-	fakeSvc := &FakeELBAPI{
+	fakeSvc := &awsapi.FakeELBAPI{
 		FakeDescribeLoadBalancers: func(input *goelb.DescribeLoadBalancersInput) (*goelb.DescribeLoadBalancersOutput, error) {
 			expected := []*string{aws.String("albiolb01"), aws.String("albiolb02")}
 			if diff := pretty.Compare(input.LoadBalancerNames, expected); diff != "" {
@@ -116,7 +117,7 @@ func TestGetLoadBalancersByNames(t *testing.T) {
 }
 
 func TestAddInstanceToLoadBalancers(t *testing.T) {
-	fakeSvc := &FakeELBAPI{
+	fakeSvc := &awsapi.FakeELBAPI{
 		FakeRegisterInstancesWithLoadBalancer: func(input *goelb.RegisterInstancesWithLoadBalancerInput) (
 			*goelb.RegisterInstancesWithLoadBalancerOutput, error) {
 			return &goelb.RegisterInstancesWithLoadBalancerOutput{}, nil
@@ -139,7 +140,7 @@ func TestAddInstanceToLoadBalancers(t *testing.T) {
 }
 
 func TestRemoveInstanceToLoadBalancers(t *testing.T) {
-	fakeSvc := &FakeELBAPI{
+	fakeSvc := &awsapi.FakeELBAPI{
 		FakeDeregisterInstancesFromLoadBalancer: func(input *goelb.DeregisterInstancesFromLoadBalancerInput) (
 			*goelb.DeregisterInstancesFromLoadBalancerOutput, error) {
 			return &goelb.DeregisterInstancesFromLoadBalancerOutput{}, nil

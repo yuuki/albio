@@ -1,4 +1,4 @@
-package elb
+package awsapi
 
 import (
 	goelb "github.com/aws/aws-sdk-go/service/elb"
