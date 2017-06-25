@@ -57,6 +57,16 @@ func (lbs LoadBalancers) NameSlice() []string {
 	return names
 }
 
+// NamePointerSlice returns a slice of loadbalancer's name.
+func (lbs LoadBalancers) NamePointerSlice() []*string {
+	names := make([]*string, 0, len(lbs))
+	for _, lb := range lbs {
+		name := lb.Name
+		names = append(names, &name)
+	}
+	return names
+}
+
 // LoadBalancer represents a loadbalancer.
 type LoadBalancer struct {
 	Name      string      `json:"name"`
