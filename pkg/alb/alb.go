@@ -13,6 +13,7 @@ import (
 
 type ALB interface {
 	GetLoadBalancersFromInstanceID(string) (model.LoadBalancers, error)
+	GetLoadBalancersByNames([]string) (model.LoadBalancers, error)
 }
 
 type _alb struct {
@@ -74,4 +75,48 @@ func (a *_alb) GetLoadBalancersFromInstanceID(instanceID string) (model.LoadBala
 	}
 
 	return model.NewLoadBalancersFromALB(loadBalancers, loadBalancerArnToTargets), nil
+}
+
+// GetLoadBalancersByNames finds LoadBalancers by loadbalancer name.
+func (a *_alb) GetLoadBalancersByNames(lbNames []string) (model.LoadBalancers, error) {
+	names := make([]*string, 0, len(lbNames))
+	for _, n := range lbNames {
+		names = append(names, aws.String(n))
+	}
+	lbResp, err := a.svc.DescribeLoadBalancers(&elbv2.DescribeLoadBalancersInput{
+		Names: names,
+	})
+	if err != nil {
+		return nil, err
+	}
+	groups := make([]*elbv2.TargetGroup, 0, len(lbResp.LoadBalancers))
+	for _, lb := range lbResp.LoadBalancers {
+		resp, err := a.svc.DescribeTargetGroups(&elbv2.DescribeTargetGroupsInput{
+			LoadBalancerArn: lb.LoadBalancerArn,
+		})
+		if err != nil {
+			return nil, err
+		}
+		groups = append(groups, resp.TargetGroups...)
+	}
+
+	loadBalancerArnToTargets := make(map[string][]*elbv2.TargetDescription)
+	// TODO make API call concurrent
+	for _, group := range groups {
+		resp, err := a.svc.DescribeTargetHealth(&elbv2.DescribeTargetHealthInput{
+			TargetGroupArn: group.TargetGroupArn,
+		})
+		if err != nil {
+			return nil, err
+		}
+		for _, desc := range resp.TargetHealthDescriptions {
+			for _, arn := range group.LoadBalancerArns {
+				loadBalancerArnToTargets[*arn] = append(
+					loadBalancerArnToTargets[*arn], desc.Target,
+				)
+			}
+		}
+	}
+
+	return model.NewLoadBalancersFromALB(lbResp, loadBalancerArnToTargets), nil
 }
