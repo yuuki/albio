@@ -14,6 +14,7 @@ import (
 type ALB interface {
 	GetLoadBalancersFromInstanceID(string) (model.LoadBalancers, error)
 	GetLoadBalancersByNames([]string) (model.LoadBalancers, error)
+	AddInstanceToLoadBalancers(string, model.LoadBalancers) error
 }
 
 type _alb struct {
@@ -119,4 +120,72 @@ func (a *_alb) GetLoadBalancersByNames(lbNames []string) (model.LoadBalancers, e
 	}
 
 	return model.NewLoadBalancersFromALB(lbResp, loadBalancerArnToTargets), nil
+}
+
+func (a *_alb) AddInstanceToLoadBalancers(instanceID string, lbs model.LoadBalancers) error {
+	lbResp, err := a.svc.DescribeLoadBalancers(&elbv2.DescribeLoadBalancersInput{
+		Names: lbs.NamePointerSlice(),
+	})
+	if err != nil {
+		return err
+	}
+	groups := make([]*elbv2.TargetGroup, 0, len(lbResp.LoadBalancers))
+	for _, lb := range lbResp.LoadBalancers {
+		resp, err := a.svc.DescribeTargetGroups(&elbv2.DescribeTargetGroupsInput{
+			LoadBalancerArn: lb.LoadBalancerArn,
+		})
+		if err != nil {
+			return err
+		}
+		groups = append(groups, resp.TargetGroups...)
+	}
+
+	for _, group := range groups {
+		_, err := a.svc.RegisterTargets(&elbv2.RegisterTargetsInput{
+			TargetGroupArn: group.TargetGroupArn,
+			Targets: []*elbv2.TargetDescription{
+				{Id: aws.String(instanceID)},
+			},
+		})
+		if err != nil {
+			return nil
+		}
+		// TODO WaitUntilInstanceInService
+	}
+
+	return nil
+}
+
+func (a *_alb) RemoveInstanceFromLoadBalancers(instanceID string, lbs model.LoadBalancers) error {
+	lbResp, err := a.svc.DescribeLoadBalancers(&elbv2.DescribeLoadBalancersInput{
+		Names: lbs.NamePointerSlice(),
+	})
+	if err != nil {
+		return err
+	}
+	groups := make([]*elbv2.TargetGroup, 0, len(lbResp.LoadBalancers))
+	for _, lb := range lbResp.LoadBalancers {
+		resp, err := a.svc.DescribeTargetGroups(&elbv2.DescribeTargetGroupsInput{
+			LoadBalancerArn: lb.LoadBalancerArn,
+		})
+		if err != nil {
+			return err
+		}
+		groups = append(groups, resp.TargetGroups...)
+	}
+
+	for _, group := range groups {
+		_, err := a.svc.DeregisterTargets(&elbv2.DeregisterTargetsInput{
+			TargetGroupArn: group.TargetGroupArn,
+			Targets: []*elbv2.TargetDescription{
+				{Id: aws.String(instanceID)},
+			},
+		})
+		if err != nil {
+			return nil
+		}
+		// TODO WaitUntilInstanceDeregistered
+	}
+
+	return nil
 }
