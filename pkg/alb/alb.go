@@ -68,37 +68,21 @@ func (a *_alb) GetLoadBalancersFromInstanceID(instanceID string) (model.LoadBala
 		}
 		loadBalancerArns = append(loadBalancerArns, group.LoadBalancerArns...)
 	}
-	loadBalancers, err := a.svc.DescribeLoadBalancers(&elbv2.DescribeLoadBalancersInput{
+	resp, err := a.svc.DescribeLoadBalancers(&elbv2.DescribeLoadBalancersInput{
 		LoadBalancerArns: loadBalancerArns,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	return model.NewLoadBalancersFromALB(loadBalancers, loadBalancerArnToTargets), nil
+	return model.NewLoadBalancersFromALB(resp.LoadBalancers, loadBalancerArnToTargets), nil
 }
 
 // GetLoadBalancersByNames finds LoadBalancers by loadbalancer name.
 func (a *_alb) GetLoadBalancersByNames(lbNames []string) (model.LoadBalancers, error) {
-	names := make([]*string, 0, len(lbNames))
-	for _, n := range lbNames {
-		names = append(names, aws.String(n))
-	}
-	lbResp, err := a.svc.DescribeLoadBalancers(&elbv2.DescribeLoadBalancersInput{
-		Names: names,
-	})
+	loadbalancers, groups, err := a.findLoadBalancersAndTargetGroupsByLoadBalancerNames(lbNames)
 	if err != nil {
 		return nil, err
-	}
-	groups := make([]*elbv2.TargetGroup, 0, len(lbResp.LoadBalancers))
-	for _, lb := range lbResp.LoadBalancers {
-		resp, err := a.svc.DescribeTargetGroups(&elbv2.DescribeTargetGroupsInput{
-			LoadBalancerArn: lb.LoadBalancerArn,
-		})
-		if err != nil {
-			return nil, err
-		}
-		groups = append(groups, resp.TargetGroups...)
 	}
 
 	loadBalancerArnToTargets := make(map[string][]*elbv2.TargetDescription)
@@ -119,25 +103,13 @@ func (a *_alb) GetLoadBalancersByNames(lbNames []string) (model.LoadBalancers, e
 		}
 	}
 
-	return model.NewLoadBalancersFromALB(lbResp, loadBalancerArnToTargets), nil
+	return model.NewLoadBalancersFromALB(loadbalancers, loadBalancerArnToTargets), nil
 }
 
 func (a *_alb) AddInstanceToLoadBalancers(instanceID string, lbs model.LoadBalancers) error {
-	lbResp, err := a.svc.DescribeLoadBalancers(&elbv2.DescribeLoadBalancersInput{
-		Names: lbs.NamePointerSlice(),
-	})
+	_, groups, err := a.findLoadBalancersAndTargetGroupsByLoadBalancerNames(lbs.NameSlice())
 	if err != nil {
 		return err
-	}
-	groups := make([]*elbv2.TargetGroup, 0, len(lbResp.LoadBalancers))
-	for _, lb := range lbResp.LoadBalancers {
-		resp, err := a.svc.DescribeTargetGroups(&elbv2.DescribeTargetGroupsInput{
-			LoadBalancerArn: lb.LoadBalancerArn,
-		})
-		if err != nil {
-			return err
-		}
-		groups = append(groups, resp.TargetGroups...)
 	}
 
 	for _, group := range groups {
@@ -157,21 +129,9 @@ func (a *_alb) AddInstanceToLoadBalancers(instanceID string, lbs model.LoadBalan
 }
 
 func (a *_alb) RemoveInstanceFromLoadBalancers(instanceID string, lbs model.LoadBalancers) error {
-	lbResp, err := a.svc.DescribeLoadBalancers(&elbv2.DescribeLoadBalancersInput{
-		Names: lbs.NamePointerSlice(),
-	})
+	_, groups, err := a.findLoadBalancersAndTargetGroupsByLoadBalancerNames(lbs.NameSlice())
 	if err != nil {
 		return err
-	}
-	groups := make([]*elbv2.TargetGroup, 0, len(lbResp.LoadBalancers))
-	for _, lb := range lbResp.LoadBalancers {
-		resp, err := a.svc.DescribeTargetGroups(&elbv2.DescribeTargetGroupsInput{
-			LoadBalancerArn: lb.LoadBalancerArn,
-		})
-		if err != nil {
-			return err
-		}
-		groups = append(groups, resp.TargetGroups...)
 	}
 
 	for _, group := range groups {
@@ -188,4 +148,29 @@ func (a *_alb) RemoveInstanceFromLoadBalancers(instanceID string, lbs model.Load
 	}
 
 	return nil
+}
+
+func (a *_alb) findLoadBalancersAndTargetGroupsByLoadBalancerNames(lbNames []string) ([]*elbv2.LoadBalancer, []*elbv2.TargetGroup, error) {
+	names := make([]*string, 0, len(lbNames))
+	for _, n := range lbNames {
+		names = append(names, aws.String(n))
+	}
+
+	lbResp, err := a.svc.DescribeLoadBalancers(&elbv2.DescribeLoadBalancersInput{
+		Names: names,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+	groups := make([]*elbv2.TargetGroup, 0, len(lbResp.LoadBalancers))
+	for _, lb := range lbResp.LoadBalancers {
+		resp, err := a.svc.DescribeTargetGroups(&elbv2.DescribeTargetGroupsInput{
+			LoadBalancerArn: lb.LoadBalancerArn,
+		})
+		if err != nil {
+			return nil, nil, err
+		}
+		groups = append(groups, resp.TargetGroups...)
+	}
+	return lbResp.LoadBalancers, groups, nil
 }

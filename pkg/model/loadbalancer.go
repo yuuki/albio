@@ -33,10 +33,10 @@ func NewLoadBalancersByInstanceID(descs []*goelb.LoadBalancerDescription, instan
 }
 
 // NewLoadBalancersFromALB creates the object of LoadBalancers from ALB.
-func NewLoadBalancersFromALB(output *elbv2.DescribeLoadBalancersOutput,
+func NewLoadBalancersFromALB(loadBalancers []*elbv2.LoadBalancer,
 	loadBalancerArnToTargets map[string][]*elbv2.TargetDescription) LoadBalancers {
-	models := make(LoadBalancers, 0, len(output.LoadBalancers))
-	for _, lb := range output.LoadBalancers {
+	models := make(LoadBalancers, 0, len(loadBalancers))
+	for _, lb := range loadBalancers {
 		targets := loadBalancerArnToTargets[*lb.LoadBalancerArn]
 		models = append(models, NewLoadBalancerFromALB(lb, targets))
 	}
