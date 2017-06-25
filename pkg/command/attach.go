@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/yuuki/albio/pkg/alb"
 	"github.com/yuuki/albio/pkg/ec2"
 	"github.com/yuuki/albio/pkg/elb"
 )
@@ -35,15 +36,23 @@ func Attach(param *AttachParam) error {
 		return fmt.Errorf("not found loadbalancers with %s. specify loadbalancer with --loadlalancer option", instanceID)
 	}
 
-	lbClient := elb.New(sess)
-
-	lbs, err := lbClient.GetLoadBalancersByNames(lbNames)
+	elbClient := elb.New(sess)
+	elbs, err := elbClient.GetLoadBalancersByNames(lbNames)
 	if err != nil {
 		return err
 	}
+	log.Println("-->", "Attaching", instanceID, "to", elbs)
+	if err := elbClient.AddInstanceToLoadBalancers(instanceID, elbs); err != nil {
+		return err
+	}
 
-	log.Println("-->", "Attaching", instanceID, "to", lbs)
-	if err := lbClient.AddInstanceToLoadBalancers(instanceID, lbs); err != nil {
+	albClient := alb.New(sess)
+	albs, err := albClient.GetLoadBalancersByNames(lbNames)
+	if err != nil {
+		return err
+	}
+	log.Println("-->", "Attaching", instanceID, "to", albs)
+	if err := elbClient.AddInstanceToLoadBalancers(instanceID, albs); err != nil {
 		return err
 	}
 

@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/session"
 
+	"github.com/yuuki/albio/pkg/alb"
 	"github.com/yuuki/albio/pkg/ec2"
 	"github.com/yuuki/albio/pkg/elb"
 )
@@ -27,22 +28,38 @@ func Detach(param *DetachParam) error {
 		}
 	}
 
-	lbClient := elb.New(sess)
-	lbs, err := lbClient.GetLoadBalancersFromInstanceID(instanceID)
+	elbClient := elb.New(sess)
+	elbs, err := elbClient.GetLoadBalancersFromInstanceID(instanceID)
 	if err != nil {
 		return err
 	}
-	if len(lbs) < 1 {
+
+	albClient := alb.New(sess)
+	albs, err := albClient.GetLoadBalancersFromInstanceID(instanceID)
+	if err != nil {
+		return err
+	}
+
+	if len(elbs) < 1 && len(albs) < 1 {
 		return fmt.Errorf("%v is not attached any loadbalancers", instanceID)
 	}
 
+	lbs := append(elbs, albs...)
 	if err := ec2Client.SaveLoadBalancersToTag(instanceID, lbs.NameSlice()); err != nil {
 		return err
 	}
 
-	log.Println("-->", "Detaching", instanceID, "from", lbs)
-	if err := lbClient.RemoveInstanceFromLoadBalancers(instanceID, lbs); err != nil {
-		return err
+	if len(elbs) > 0 {
+		log.Println("-->", "Detaching", instanceID, "from", elbs)
+		if err := elbClient.RemoveInstanceFromLoadBalancers(instanceID, elbs); err != nil {
+			return err
+		}
+	}
+	if len(albs) > 0 {
+		log.Println("-->", "Detaching", instanceID, "from", albs)
+		if err := albClient.RemoveInstanceFromLoadBalancers(instanceID, albs); err != nil {
+			return err
+		}
 	}
 
 	return nil
