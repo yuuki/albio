@@ -15,6 +15,7 @@ type ALB interface {
 	GetLoadBalancersFromInstanceID(string) (model.LoadBalancers, error)
 	GetLoadBalancersByNames([]string) (model.LoadBalancers, error)
 	AddInstanceToLoadBalancers(string, model.LoadBalancers) error
+	RemoveInstanceFromLoadBalancers(string, model.LoadBalancers) error
 }
 
 type _alb struct {
@@ -120,7 +121,7 @@ func (a *_alb) AddInstanceToLoadBalancers(instanceID string, lbs model.LoadBalan
 			},
 		})
 		if err != nil {
-			return nil
+			return err
 		}
 		// TODO WaitUntilInstanceInService
 	}
@@ -142,7 +143,7 @@ func (a *_alb) RemoveInstanceFromLoadBalancers(instanceID string, lbs model.Load
 			},
 		})
 		if err != nil {
-			return nil
+			return err
 		}
 		// TODO WaitUntilInstanceDeregistered
 	}
