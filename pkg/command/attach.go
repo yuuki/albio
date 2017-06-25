@@ -52,7 +52,7 @@ func Attach(param *AttachParam) error {
 		return err
 	}
 	log.Println("-->", "Attaching", instanceID, "to", albs)
-	if err := elbClient.AddInstanceToLoadBalancers(instanceID, albs); err != nil {
+	if err := albClient.AddInstanceToLoadBalancers(instanceID, albs); err != nil {
 		return err
 	}
 
