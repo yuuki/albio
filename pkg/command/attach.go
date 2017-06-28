@@ -11,7 +11,8 @@ import (
 )
 
 type AttachParam struct {
-	InstanceID string
+	InstanceID       string
+	LoadBalancerName string
 }
 
 func Attach(param *AttachParam) error {
@@ -32,28 +33,52 @@ func Attach(param *AttachParam) error {
 		return err
 	}
 
-	if len(lbNames) < 1 {
-		return fmt.Errorf("not found loadbalancers with %s. specify loadbalancer with --loadlalancer option", instanceID)
-	}
+	if param.LoadBalancerName == "" {
+		if len(lbNames) < 1 {
+			return fmt.Errorf("not found loadbalancers with %s. specify loadbalancer with --loadlalancer option", instanceID)
+		}
 
-	elbClient := elb.New(sess)
-	elbs, err := elbClient.GetLoadBalancersByNames(lbNames)
-	if err != nil {
-		return err
-	}
-	log.Println("-->", "Attaching", instanceID, "to", elbs)
-	if err := elbClient.AddInstanceToLoadBalancers(instanceID, elbs); err != nil {
-		return err
-	}
+		elbClient := elb.New(sess)
+		elbs, err := elbClient.GetLoadBalancersByNames(lbNames)
+		if err != nil {
+			return err
+		}
+		log.Println("-->", "Attaching", instanceID, "to", elbs)
+		if err := elbClient.AddInstanceToLoadBalancers(instanceID, elbs); err != nil {
+			return err
+		}
 
-	albClient := alb.New(sess)
-	albs, err := albClient.GetLoadBalancersByNames(lbNames)
-	if err != nil {
-		return err
-	}
-	log.Println("-->", "Attaching", instanceID, "to", albs)
-	if err := albClient.AddInstanceToLoadBalancers(instanceID, albs); err != nil {
-		return err
+		albClient := alb.New(sess)
+		albs, err := albClient.GetLoadBalancersByNames(lbNames)
+		if err != nil {
+			return err
+		}
+		log.Println("-->", "Attaching", instanceID, "to", albs)
+		if err := albClient.AddInstanceToLoadBalancers(instanceID, albs); err != nil {
+			return err
+		}
+	} else {
+		elbClient := elb.New(sess)
+		elbs, err := elbClient.GetLoadBalancersByNames([]string{param.LoadBalancerName})
+		if err != nil {
+			return err
+		}
+		log.Println("-->", "Attaching", instanceID, "to", elbs)
+		if err := elbClient.AddInstanceToLoadBalancers(instanceID, elbs); err != nil {
+			return err
+		}
+
+		albClient := alb.New(sess)
+		albs, err := albClient.GetLoadBalancersByNames([]string{param.LoadBalancerName})
+		if err != nil {
+			return err
+		}
+		log.Println("-->", "Attaching", instanceID, "to", albs)
+		if err := albClient.AddInstanceToLoadBalancers(instanceID, albs); err != nil {
+			return err
+		}
+
+		lbNames = append(lbNames, param.LoadBalancerName)
 	}
 
 	if err := ec2Client.SaveLoadBalancersToTag(instanceID, lbNames); err != nil {
