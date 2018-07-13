@@ -3,8 +3,8 @@
 package efs_test
 
 import (
-	"bytes"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -14,7 +14,7 @@ import (
 )
 
 var _ time.Duration
-var _ bytes.Buffer
+var _ strings.Reader
 var _ aws.Config
 
 func parseTime(layout, value string) *time.Time {
@@ -48,6 +48,10 @@ func ExampleEFS_CreateFileSystem_shared00() {
 				fmt.Println(efs.ErrCodeFileSystemAlreadyExists, aerr.Error())
 			case efs.ErrCodeFileSystemLimitExceeded:
 				fmt.Println(efs.ErrCodeFileSystemLimitExceeded, aerr.Error())
+			case efs.ErrCodeInsufficientThroughputCapacity:
+				fmt.Println(efs.ErrCodeInsufficientThroughputCapacity, aerr.Error())
+			case efs.ErrCodeThroughputLimitExceeded:
+				fmt.Println(efs.ErrCodeThroughputLimitExceeded, aerr.Error())
 			default:
 				fmt.Println(aerr.Error())
 			}

@@ -3,8 +3,8 @@
 package inspector_test
 
 import (
-	"bytes"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -14,7 +14,7 @@ import (
 )
 
 var _ time.Duration
-var _ bytes.Buffer
+var _ strings.Reader
 var _ aws.Config
 
 func parseTime(layout, value string) *time.Time {
@@ -95,6 +95,8 @@ func ExampleInspector_CreateAssessmentTarget_shared00() {
 				fmt.Println(inspector.ErrCodeAccessDeniedException, aerr.Error())
 			case inspector.ErrCodeNoSuchEntityException:
 				fmt.Println(inspector.ErrCodeNoSuchEntityException, aerr.Error())
+			case inspector.ErrCodeInvalidCrossAccountRoleException:
+				fmt.Println(inspector.ErrCodeInvalidCrossAccountRoleException, aerr.Error())
 			default:
 				fmt.Println(aerr.Error())
 			}

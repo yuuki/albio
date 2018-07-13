@@ -14,12 +14,16 @@
     "aws/credentials/ec2rolecreds",
     "aws/credentials/endpointcreds",
     "aws/credentials/stscreds",
+    "aws/csm",
     "aws/defaults",
     "aws/ec2metadata",
     "aws/endpoints",
     "aws/request",
     "aws/session",
     "aws/signer/v4",
+    "internal/sdkio",
+    "internal/sdkrand",
+    "internal/sdkuri",
     "internal/shareddefaults",
     "private/protocol",
     "private/protocol/ec2query",
@@ -32,8 +36,8 @@
     "service/elbv2",
     "service/sts"
   ]
-  revision = "a9609d199df31ef4b1f347b007d63bb7c48e5619"
-  version = "v1.10.0"
+  revision = "9e9afa0895e9daff556cc18f90dc53eb91f41ffd"
+  version = "v1.14.26"
 
 [[projects]]
   name = "github.com/go-ini/ini"
@@ -44,8 +48,7 @@
 [[projects]]
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
-  revision = "3433f3ea46d9f8019119e7dd41274e112a2359a9"
-  version = "0.2.2"
+  revision = "0b12d6b5"
 
 [[projects]]
   name = "github.com/kylelemons/godebug"
@@ -58,6 +61,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "155318dedd7e4ec565a274455e73836c6157a8ad6079f3f073469a2103806f55"
+  inputs-digest = "910309dfc7172500d43e4f9ac840651c2888c60f7b9e9b17ea3c8b052922524a"
   solver-name = "gps-cdcl"
   solver-version = 1

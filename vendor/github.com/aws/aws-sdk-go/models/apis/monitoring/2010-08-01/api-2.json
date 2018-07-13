@@ -22,6 +22,23 @@
         {"shape":"ResourceNotFound"}
       ]
     },
+    "DeleteDashboards":{
+      "name":"DeleteDashboards",
+      "http":{
+        "method":"POST",
+        "requestUri":"/"
+      },
+      "input":{"shape":"DeleteDashboardsInput"},
+      "output":{
+        "shape":"DeleteDashboardsOutput",
+        "resultWrapper":"DeleteDashboardsResult"
+      },
+      "errors":[
+        {"shape":"InvalidParameterValueException"},
+        {"shape":"DashboardNotFoundError"},
+        {"shape":"InternalServiceFault"}
+      ]
+    },
     "DescribeAlarmHistory":{
       "name":"DescribeAlarmHistory",
       "http":{
@@ -80,6 +97,38 @@
       },
       "input":{"shape":"EnableAlarmActionsInput"}
     },
+    "GetDashboard":{
+      "name":"GetDashboard",
+      "http":{
+        "method":"POST",
+        "requestUri":"/"
+      },
+      "input":{"shape":"GetDashboardInput"},
+      "output":{
+        "shape":"GetDashboardOutput",
+        "resultWrapper":"GetDashboardResult"
+      },
+      "errors":[
+        {"shape":"InvalidParameterValueException"},
+        {"shape":"DashboardNotFoundError"},
+        {"shape":"InternalServiceFault"}
+      ]
+    },
+    "GetMetricData":{
+      "name":"GetMetricData",
+      "http":{
+        "method":"POST",
+        "requestUri":"/"
+      },
+      "input":{"shape":"GetMetricDataInput"},
+      "output":{
+        "shape":"GetMetricDataOutput",
+        "resultWrapper":"GetMetricDataResult"
+      },
+      "errors":[
+        {"shape":"InvalidNextToken"}
+      ]
+    },
     "GetMetricStatistics":{
       "name":"GetMetricStatistics",
       "http":{
@@ -98,6 +147,22 @@
         {"shape":"InternalServiceFault"}
       ]
     },
+    "ListDashboards":{
+      "name":"ListDashboards",
+      "http":{
+        "method":"POST",
+        "requestUri":"/"
+      },
+      "input":{"shape":"ListDashboardsInput"},
+      "output":{
+        "shape":"ListDashboardsOutput",
+        "resultWrapper":"ListDashboardsResult"
+      },
+      "errors":[
+        {"shape":"InvalidParameterValueException"},
+        {"shape":"InternalServiceFault"}
+      ]
+    },
     "ListMetrics":{
       "name":"ListMetrics",
       "http":{
@@ -112,6 +177,22 @@
       "errors":[
         {"shape":"InternalServiceFault"},
         {"shape":"InvalidParameterValueException"}
+      ]
+    },
+    "PutDashboard":{
+      "name":"PutDashboard",
+      "http":{
+        "method":"POST",
+        "requestUri":"/"
+      },
+      "input":{"shape":"PutDashboardInput"},
+      "output":{
+        "shape":"PutDashboardOutput",
+        "resultWrapper":"PutDashboardResult"
+      },
+      "errors":[
+        {"shape":"DashboardInvalidInputError"},
+        {"shape":"InternalServiceFault"}
       ]
     },
     "PutMetricAlarm":{
@@ -208,6 +289,65 @@
         "LessThanOrEqualToThreshold"
       ]
     },
+    "DashboardArn":{"type":"string"},
+    "DashboardBody":{"type":"string"},
+    "DashboardEntries":{
+      "type":"list",
+      "member":{"shape":"DashboardEntry"}
+    },
+    "DashboardEntry":{
+      "type":"structure",
+      "members":{
+        "DashboardName":{"shape":"DashboardName"},
+        "DashboardArn":{"shape":"DashboardArn"},
+        "LastModified":{"shape":"LastModified"},
+        "Size":{"shape":"Size"}
+      }
+    },
+    "DashboardErrorMessage":{"type":"string"},
+    "DashboardInvalidInputError":{
+      "type":"structure",
+      "members":{
+        "message":{"shape":"DashboardErrorMessage"},
+        "dashboardValidationMessages":{"shape":"DashboardValidationMessages"}
+      },
+      "error":{
+        "code":"InvalidParameterInput",
+        "httpStatusCode":400,
+        "senderFault":true
+      },
+      "exception":true
+    },
+    "DashboardName":{"type":"string"},
+    "DashboardNamePrefix":{"type":"string"},
+    "DashboardNames":{
+      "type":"list",
+      "member":{"shape":"DashboardName"}
+    },
+    "DashboardNotFoundError":{
+      "type":"structure",
+      "members":{
+        "message":{"shape":"DashboardErrorMessage"}
+      },
+      "error":{
+        "code":"ResourceNotFound",
+        "httpStatusCode":404,
+        "senderFault":true
+      },
+      "exception":true
+    },
+    "DashboardValidationMessage":{
+      "type":"structure",
+      "members":{
+        "DataPath":{"shape":"DataPath"},
+        "Message":{"shape":"Message"}
+      }
+    },
+    "DashboardValidationMessages":{
+      "type":"list",
+      "member":{"shape":"DashboardValidationMessage"}
+    },
+    "DataPath":{"type":"string"},
     "Datapoint":{
       "type":"structure",
       "members":{
@@ -237,15 +377,35 @@
       "key":{"shape":"ExtendedStatistic"},
       "value":{"shape":"DatapointValue"}
     },
+    "DatapointValues":{
+      "type":"list",
+      "member":{"shape":"DatapointValue"}
+    },
     "Datapoints":{
       "type":"list",
       "member":{"shape":"Datapoint"}
+    },
+    "DatapointsToAlarm":{
+      "type":"integer",
+      "min":1
     },
     "DeleteAlarmsInput":{
       "type":"structure",
       "required":["AlarmNames"],
       "members":{
         "AlarmNames":{"shape":"AlarmNames"}
+      }
+    },
+    "DeleteDashboardsInput":{
+      "type":"structure",
+      "required":["DashboardNames"],
+      "members":{
+        "DashboardNames":{"shape":"DashboardNames"}
+      }
+    },
+    "DeleteDashboardsOutput":{
+      "type":"structure",
+      "members":{
       }
     },
     "DescribeAlarmHistoryInput":{
@@ -388,6 +548,45 @@
       "min":1
     },
     "FaultDescription":{"type":"string"},
+    "GetDashboardInput":{
+      "type":"structure",
+      "required":["DashboardName"],
+      "members":{
+        "DashboardName":{"shape":"DashboardName"}
+      }
+    },
+    "GetDashboardOutput":{
+      "type":"structure",
+      "members":{
+        "DashboardArn":{"shape":"DashboardArn"},
+        "DashboardBody":{"shape":"DashboardBody"},
+        "DashboardName":{"shape":"DashboardName"}
+      }
+    },
+    "GetMetricDataInput":{
+      "type":"structure",
+      "required":[
+        "MetricDataQueries",
+        "StartTime",
+        "EndTime"
+      ],
+      "members":{
+        "MetricDataQueries":{"shape":"MetricDataQueries"},
+        "StartTime":{"shape":"Timestamp"},
+        "EndTime":{"shape":"Timestamp"},
+        "NextToken":{"shape":"NextToken"},
+        "ScanBy":{"shape":"ScanBy"},
+        "MaxDatapoints":{"shape":"GetMetricDataMaxDatapoints"}
+      }
+    },
+    "GetMetricDataMaxDatapoints":{"type":"integer"},
+    "GetMetricDataOutput":{
+      "type":"structure",
+      "members":{
+        "MetricDataResults":{"shape":"MetricDataResults"},
+        "NextToken":{"shape":"NextToken"}
+      }
+    },
     "GetMetricStatisticsInput":{
       "type":"structure",
       "required":[
@@ -494,6 +693,7 @@
       },
       "exception":true
     },
+    "LastModified":{"type":"timestamp"},
     "LimitExceededFault":{
       "type":"structure",
       "members":{
@@ -505,6 +705,20 @@
         "senderFault":true
       },
       "exception":true
+    },
+    "ListDashboardsInput":{
+      "type":"structure",
+      "members":{
+        "DashboardNamePrefix":{"shape":"DashboardNamePrefix"},
+        "NextToken":{"shape":"NextToken"}
+      }
+    },
+    "ListDashboardsOutput":{
+      "type":"structure",
+      "members":{
+        "DashboardEntries":{"shape":"DashboardEntries"},
+        "NextToken":{"shape":"NextToken"}
+      }
     },
     "ListMetricsInput":{
       "type":"structure",
@@ -531,6 +745,16 @@
       "max":100,
       "min":1
     },
+    "Message":{"type":"string"},
+    "MessageData":{
+      "type":"structure",
+      "members":{
+        "Code":{"shape":"MessageDataCode"},
+        "Value":{"shape":"MessageDataValue"}
+      }
+    },
+    "MessageDataCode":{"type":"string"},
+    "MessageDataValue":{"type":"string"},
     "Metric":{
       "type":"structure",
       "members":{
@@ -567,6 +791,7 @@
         "Period":{"shape":"Period"},
         "Unit":{"shape":"StandardUnit"},
         "EvaluationPeriods":{"shape":"EvaluationPeriods"},
+        "DatapointsToAlarm":{"shape":"DatapointsToAlarm"},
         "Threshold":{"shape":"Threshold"},
         "ComparisonOperator":{"shape":"ComparisonOperator"},
         "TreatMissingData":{"shape":"TreatMissingData"},
@@ -596,7 +821,8 @@
         "ComparisonOperator",
         "ExtendedStatistic",
         "TreatMissingData",
-        "EvaluateLowSampleCountPercentile"
+        "EvaluateLowSampleCountPercentile",
+        "DatapointsToAlarm"
       ]
     },
     "MetricAlarms":{
@@ -607,6 +833,40 @@
       "type":"list",
       "member":{"shape":"MetricDatum"}
     },
+    "MetricDataQueries":{
+      "type":"list",
+      "member":{"shape":"MetricDataQuery"}
+    },
+    "MetricDataQuery":{
+      "type":"structure",
+      "required":["Id"],
+      "members":{
+        "Id":{"shape":"MetricId"},
+        "MetricStat":{"shape":"MetricStat"},
+        "Expression":{"shape":"MetricExpression"},
+        "Label":{"shape":"MetricLabel"},
+        "ReturnData":{"shape":"ReturnData"}
+      }
+    },
+    "MetricDataResult":{
+      "type":"structure",
+      "members":{
+        "Id":{"shape":"MetricId"},
+        "Label":{"shape":"MetricLabel"},
+        "Timestamps":{"shape":"Timestamps"},
+        "Values":{"shape":"DatapointValues"},
+        "StatusCode":{"shape":"StatusCode"},
+        "Messages":{"shape":"MetricDataResultMessages"}
+      }
+    },
+    "MetricDataResultMessages":{
+      "type":"list",
+      "member":{"shape":"MessageData"}
+    },
+    "MetricDataResults":{
+      "type":"list",
+      "member":{"shape":"MetricDataResult"}
+    },
     "MetricDatum":{
       "type":"structure",
       "required":["MetricName"],
@@ -616,14 +876,39 @@
         "Timestamp":{"shape":"Timestamp"},
         "Value":{"shape":"DatapointValue"},
         "StatisticValues":{"shape":"StatisticSet"},
-        "Unit":{"shape":"StandardUnit"}
+        "Unit":{"shape":"StandardUnit"},
+        "StorageResolution":{"shape":"StorageResolution"}
       }
+    },
+    "MetricExpression":{
+      "type":"string",
+      "max":1024,
+      "min":1
+    },
+    "MetricId":{
+      "type":"string",
+      "max":255,
+      "min":1
     },
     "MetricLabel":{"type":"string"},
     "MetricName":{
       "type":"string",
       "max":255,
       "min":1
+    },
+    "MetricStat":{
+      "type":"structure",
+      "required":[
+        "Metric",
+        "Period",
+        "Stat"
+      ],
+      "members":{
+        "Metric":{"shape":"Metric"},
+        "Period":{"shape":"Period"},
+        "Stat":{"shape":"Stat"},
+        "Unit":{"shape":"StandardUnit"}
+      }
     },
     "Metrics":{
       "type":"list",
@@ -654,7 +939,24 @@
     },
     "Period":{
       "type":"integer",
-      "min":60
+      "min":1
+    },
+    "PutDashboardInput":{
+      "type":"structure",
+      "required":[
+        "DashboardName",
+        "DashboardBody"
+      ],
+      "members":{
+        "DashboardName":{"shape":"DashboardName"},
+        "DashboardBody":{"shape":"DashboardBody"}
+      }
+    },
+    "PutDashboardOutput":{
+      "type":"structure",
+      "members":{
+        "DashboardValidationMessages":{"shape":"DashboardValidationMessages"}
+      }
     },
     "PutMetricAlarmInput":{
       "type":"structure",
@@ -682,6 +984,7 @@
         "Period":{"shape":"Period"},
         "Unit":{"shape":"StandardUnit"},
         "EvaluationPeriods":{"shape":"EvaluationPeriods"},
+        "DatapointsToAlarm":{"shape":"DatapointsToAlarm"},
         "Threshold":{"shape":"Threshold"},
         "ComparisonOperator":{"shape":"ComparisonOperator"},
         "TreatMissingData":{"shape":"TreatMissingData"},
@@ -721,6 +1024,14 @@
       },
       "exception":true
     },
+    "ReturnData":{"type":"boolean"},
+    "ScanBy":{
+      "type":"string",
+      "enum":[
+        "TimestampDescending",
+        "TimestampAscending"
+      ]
+    },
     "SetAlarmStateInput":{
       "type":"structure",
       "required":[
@@ -735,6 +1046,7 @@
         "StateReasonData":{"shape":"StateReasonData"}
       }
     },
+    "Size":{"type":"long"},
     "StandardUnit":{
       "type":"string",
       "enum":[
@@ -767,6 +1079,7 @@
         "None"
       ]
     },
+    "Stat":{"type":"string"},
     "StateReason":{
       "type":"string",
       "max":1023,
@@ -816,8 +1129,24 @@
       "max":5,
       "min":1
     },
+    "StatusCode":{
+      "type":"string",
+      "enum":[
+        "Complete",
+        "InternalError",
+        "PartialData"
+      ]
+    },
+    "StorageResolution":{
+      "type":"integer",
+      "min":1
+    },
     "Threshold":{"type":"double"},
     "Timestamp":{"type":"timestamp"},
+    "Timestamps":{
+      "type":"list",
+      "member":{"shape":"Timestamp"}
+    },
     "TreatMissingData":{
       "type":"string",
       "max":255,

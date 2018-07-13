@@ -147,7 +147,7 @@ func (d Downloader) Download(w io.WriterAt, input *s3.GetObjectInput, options ..
 //
 // DownloadWithContext is the same as Download with the additional support for
 // Context input parameters. The Context must not be nil. A nil Context will
-// cause a panic. Use the Context to add deadlining, timeouts, ect. The
+// cause a panic. Use the Context to add deadlining, timeouts, etc. The
 // DownloadWithContext may create sub-contexts for individual underlying
 // requests.
 //
@@ -231,13 +231,15 @@ func (d Downloader) DownloadWithIterator(ctx aws.Context, iter BatchDownloadIter
 	for iter.Next() {
 		object := iter.DownloadObject()
 		if _, err := d.DownloadWithContext(ctx, object.Writer, object.Object, opts...); err != nil {
-			s3Err := Error{
-				OrigErr: err,
-				Bucket:  object.Object.Bucket,
-				Key:     object.Object.Key,
-			}
+			errs = append(errs, newError(err, object.Object.Bucket, object.Object.Key))
+		}
 
-			errs = append(errs, s3Err)
+		if object.After == nil {
+			continue
+		}
+
+		if err := object.After(); err != nil {
+			errs = append(errs, newError(err, object.Object.Bucket, object.Object.Key))
 		}
 	}
 
