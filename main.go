@@ -1,3 +1,4 @@
+//go:generate go-bindata -pkg main -o credits.go CREDITS
 package main
 
 import (
@@ -7,6 +8,10 @@ import (
 	"os"
 
 	"github.com/yuuki/albio/pkg/command"
+)
+
+var (
+	creditsText = string(MustAsset("CREDITS"))
 )
 
 // CLI is the command line object.
@@ -42,6 +47,8 @@ func (cli *CLI) Run(args []string) int {
 		return 0
 	case "-h", "--help":
 		fmt.Fprint(cli.errStream, helpText)
+	case "--credits":
+		fmt.Fprint(cli.errStream, creditsText)
 	default:
 		fmt.Fprint(cli.errStream, helpText)
 		return 1
