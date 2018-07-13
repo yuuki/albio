@@ -1,6 +1,7 @@
 COMMIT = $$(git describe --always)
 PKG = github.com/yuuki/albio
 PKGS = $$(go list ./... | grep -v vendor)
+CREDITS = CREDITS
 
 all: build
 
@@ -27,3 +28,11 @@ minor: gobump
 .PHONY: gobump
 gobump:
 	go get -u github.com/motemen/gobump/cmd/gobump
+
+.PHONY: credits
+credits:
+	go get github.com/go-bindata/go-bindata/...
+	script/credits > $(CREDITS)
+ifneq (,$(git status -s $(CREDITS)))
+	go generate -x .
+endif

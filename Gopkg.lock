@@ -3,7 +3,35 @@
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
-  packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/shareddefaults","private/protocol","private/protocol/ec2query","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/xml/xmlutil","service/ec2","service/ec2/ec2iface","service/elb","service/elb/elbiface","service/sts"]
+  packages = [
+    "aws",
+    "aws/awserr",
+    "aws/awsutil",
+    "aws/client",
+    "aws/client/metadata",
+    "aws/corehandlers",
+    "aws/credentials",
+    "aws/credentials/ec2rolecreds",
+    "aws/credentials/endpointcreds",
+    "aws/credentials/stscreds",
+    "aws/defaults",
+    "aws/ec2metadata",
+    "aws/endpoints",
+    "aws/request",
+    "aws/session",
+    "aws/signer/v4",
+    "internal/shareddefaults",
+    "private/protocol",
+    "private/protocol/ec2query",
+    "private/protocol/query",
+    "private/protocol/query/queryutil",
+    "private/protocol/rest",
+    "private/protocol/xml/xmlutil",
+    "service/ec2",
+    "service/elb",
+    "service/elbv2",
+    "service/sts"
+  ]
   revision = "a9609d199df31ef4b1f347b007d63bb7c48e5619"
   version = "v1.10.0"
 
@@ -21,12 +49,15 @@
 
 [[projects]]
   name = "github.com/kylelemons/godebug"
-  packages = ["diff","pretty"]
+  packages = [
+    "diff",
+    "pretty"
+  ]
   revision = "a616ab194758ae0a11290d87ca46ee8c440117b0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "124a1d0413f7af03818b47c3d9e0ff95a7b8db6c72f98ca0f144f0151ab875f6"
+  inputs-digest = "155318dedd7e4ec565a274455e73836c6157a8ad6079f3f073469a2103806f55"
   solver-name = "gps-cdcl"
   solver-version = 1
