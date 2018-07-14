@@ -19,8 +19,8 @@ func NewLoadBalancers(descs []*goelb.LoadBalancerDescription) LoadBalancers {
 	return lbs
 }
 
-// NewLoadBalancersByInstanceID creates the object of LoadBalancers from elb.LoadBalancerDescription.
-func NewLoadBalancersByInstanceID(descs []*goelb.LoadBalancerDescription, instanceID string) LoadBalancers {
+// NewLoadBalancersByInstanceIDFromELBv1 creates the object of LoadBalancers from elb.LoadBalancerDescription.
+func NewLoadBalancersByInstanceIDFromELBv1(descs []*goelb.LoadBalancerDescription, instanceID string) LoadBalancers {
 	var lbs LoadBalancers
 	for _, desc := range descs {
 		for _, instance := range desc.Instances {
@@ -38,6 +38,9 @@ func NewLoadBalancersFromALB(loadBalancers []*elbv2.LoadBalancer,
 	models := make(LoadBalancers, 0, len(loadBalancers))
 	for _, lb := range loadBalancers {
 		targets := loadBalancerArnToTargets[*lb.LoadBalancerArn]
+		if len(targets) == 0 {
+			continue
+		}
 		models = append(models, NewLoadBalancerFromALB(lb, targets))
 	}
 	return models

@@ -30,7 +30,7 @@ func (e *_elb) GetLoadBalancersFromInstanceID(instanceID string) (model.LoadBala
 	if err != nil {
 		return nil, err
 	}
-	return model.NewLoadBalancersByInstanceID(resp.LoadBalancerDescriptions, instanceID), nil
+	return model.NewLoadBalancersByInstanceIDFromELBv1(resp.LoadBalancerDescriptions, instanceID), nil
 }
 
 func (e *_elb) GetLoadBalancersByNames(lbNames []string) (model.LoadBalancers, error) {
