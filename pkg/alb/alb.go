@@ -1,10 +1,7 @@
 package alb
 
 import (
-	"os"
-
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/yuuki/albio/pkg/awsapi"
@@ -23,12 +20,8 @@ type _alb struct {
 }
 
 func New(sess *session.Session) ALB {
-	region := os.Getenv("AWS_REGION")
-	if region == "" {
-		region, _ = ec2metadata.New(sess).Region()
-	}
 	return &_alb{
-		svc: elbv2.New(sess, aws.NewConfig().WithRegion(region)),
+		svc: elbv2.New(sess),
 	}
 }
 

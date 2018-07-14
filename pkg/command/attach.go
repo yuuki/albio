@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/yuuki/albio/pkg/alb"
+	"github.com/yuuki/albio/pkg/awsapi"
 	"github.com/yuuki/albio/pkg/ec2"
 	"github.com/yuuki/albio/pkg/elb"
 )
@@ -16,7 +16,11 @@ type AttachParam struct {
 }
 
 func Attach(param *AttachParam) error {
-	sess := session.New()
+	sess, err := awsapi.Session()
+	if err != nil {
+		return err
+	}
+
 	ec2Client := ec2.New(sess)
 
 	var instanceID string

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/yuuki/albio/pkg/alb"
+	"github.com/yuuki/albio/pkg/awsapi"
 	"github.com/yuuki/albio/pkg/ec2"
 	"github.com/yuuki/albio/pkg/elb"
 )
@@ -16,7 +16,10 @@ type StatusParam struct {
 }
 
 func Status(param *StatusParam) error {
-	sess := session.New()
+	sess, err := awsapi.Session()
+	if err != nil {
+		return err
+	}
 
 	var instanceID string
 	if param.InstanceID == "" {
@@ -31,6 +34,7 @@ func Status(param *StatusParam) error {
 	if err != nil {
 		return err
 	}
+
 	albs, err := alb.New(sess).GetLoadBalancersFromInstanceID(instanceID)
 	if err != nil {
 		return err

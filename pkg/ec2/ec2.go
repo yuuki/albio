@@ -1,7 +1,6 @@
 package ec2
 
 import (
-	"os"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -25,14 +24,9 @@ type _ec2 struct {
 }
 
 func New(sess *session.Session) EC2 {
-	mdSvc := ec2metadata.New(sess)
-	region := os.Getenv("AWS_REGION")
-	if region == "" {
-		region, _ = mdSvc.Region()
-	}
 	return &_ec2{
-		svc:         goec2.New(sess, aws.NewConfig().WithRegion(region)),
-		metadataSvc: mdSvc,
+		svc:         goec2.New(sess),
+		metadataSvc: ec2metadata.New(sess),
 	}
 }
 
