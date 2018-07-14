@@ -6,7 +6,7 @@ RELEASE_BUILD_LDFLAGS = -s -w $(BUILD_LDFLAGS)
 CREDITS = ./CREDITS
 
 .PHONY: build
-build:
+build: credits
 	go build -ldflags="$(BUILD_LDFLAGS)"
 
 .PHONY: test
@@ -37,12 +37,12 @@ ifneq (,$(git status -s $(CREDITS)))
 endif
 
 .PHONY: crossbuild
-crossbuild: devel-deps
+crossbuild: devel-deps credits
 	$(eval ver = $(shell gobump show -r))
 	goxz -pv=v$(ver) -os=linux,darwin -arch=386,amd64 -build-ldflags="$(RELEASE_BUILD_LDFLAGS)" \
 	  -d=./dist/v$(ver)
 
 .PHONY: release
-release: devel-deps
+release: devel-deps crossbuild
 	_tools/release
 	_tools/upload_artifacts
