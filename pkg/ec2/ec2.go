@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/defaults"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
 	goec2 "github.com/aws/aws-sdk-go/service/ec2"
@@ -31,7 +32,9 @@ func New(sess *session.Session) EC2 {
 		region, _ = mdSvc.Region()
 	}
 	return &_ec2{
-		svc:         goec2.New(sess, aws.NewConfig().WithRegion(region)),
+		svc: goec2.New(sess,
+			defaults.Config().WithRegion(region).WithCredentialsChainVerboseErrors(true),
+		),
 		metadataSvc: mdSvc,
 	}
 }

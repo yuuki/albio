@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/defaults"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
 	goelb "github.com/aws/aws-sdk-go/service/elb"
@@ -28,7 +29,9 @@ func New(sess *session.Session) ELB {
 		region, _ = ec2metadata.New(sess).Region()
 	}
 	return &_elb{
-		svc: goelb.New(sess, aws.NewConfig().WithRegion(region)),
+		svc: goelb.New(sess,
+			defaults.Config().WithRegion(region).WithCredentialsChainVerboseErrors(true),
+		),
 	}
 }
 
