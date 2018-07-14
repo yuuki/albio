@@ -14,7 +14,7 @@ func TestRun_versionFlag(t *testing.T) {
 
 	status := cli.Run(args)
 	if status != 0 {
-		t.Errorf("expected %d to eq %d", status, 0)
+		t.Errorf("expected %d to eq %d", status, exitCodeOK)
 	}
 
 	expected := fmt.Sprintf("albio version %s", Version)
@@ -29,8 +29,8 @@ func TestRun_parseError(t *testing.T) {
 	args := strings.Split("albio --not-exist", " ")
 
 	status := cli.Run(args)
-	if status != 1 {
-		t.Errorf("expected %d to eq %d", status, 1)
+	if status != exitCodeErr {
+		t.Errorf("expected %d to eq %d", status, exitCodeErr)
 	}
 
 	expected := "Usage: albio"
