@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/yuuki/albio/pkg/alb"
 	"github.com/yuuki/albio/pkg/awsapi"
 	"github.com/yuuki/albio/pkg/ec2"
-	"github.com/yuuki/albio/pkg/elb"
+	"github.com/yuuki/albio/pkg/elbv1"
+	"github.com/yuuki/albio/pkg/elbv2"
 )
 
 type StatusParam struct {
@@ -30,12 +30,12 @@ func Status(param *StatusParam) error {
 		}
 	}
 
-	elbs, err := elb.New(sess).GetLoadBalancersFromInstanceID(instanceID)
+	elbs, err := elbv1.New(sess).GetLoadBalancersFromInstanceID(instanceID)
 	if err != nil {
 		return err
 	}
 
-	albs, err := alb.New(sess).GetLoadBalancersFromInstanceID(instanceID)
+	albs, err := elbv2.New(sess).GetLoadBalancersFromInstanceID(instanceID)
 	if err != nil {
 		return err
 	}

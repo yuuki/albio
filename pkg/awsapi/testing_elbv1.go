@@ -4,8 +4,8 @@ import (
 	goelb "github.com/aws/aws-sdk-go/service/elb"
 )
 
-type FakeELBAPI struct {
-	ELBAPI
+type FakeELBv1API struct {
+	ELBv1API
 	FakeDescribeLoadBalancers               func(input *goelb.DescribeLoadBalancersInput) (*goelb.DescribeLoadBalancersOutput, error)
 	FakeRegisterInstancesWithLoadBalancer   func(input *goelb.RegisterInstancesWithLoadBalancerInput) (*goelb.RegisterInstancesWithLoadBalancerOutput, error)
 	FakeWaitUntilInstanceInService          func(input *goelb.DescribeInstanceHealthInput) error
@@ -13,24 +13,24 @@ type FakeELBAPI struct {
 	FakeWaitUntilInstanceDeregistered       func(input *goelb.DescribeInstanceHealthInput) error
 }
 
-func (e *FakeELBAPI) DescribeLoadBalancers(input *goelb.DescribeLoadBalancersInput) (*goelb.DescribeLoadBalancersOutput, error) {
+func (e *FakeELBv1API) DescribeLoadBalancers(input *goelb.DescribeLoadBalancersInput) (*goelb.DescribeLoadBalancersOutput, error) {
 	return e.FakeDescribeLoadBalancers(input)
 }
 
-func (e *FakeELBAPI) RegisterInstancesWithLoadBalancer(input *goelb.RegisterInstancesWithLoadBalancerInput) (
+func (e *FakeELBv1API) RegisterInstancesWithLoadBalancer(input *goelb.RegisterInstancesWithLoadBalancerInput) (
 	*goelb.RegisterInstancesWithLoadBalancerOutput, error) {
 	return e.FakeRegisterInstancesWithLoadBalancer(input)
 }
 
-func (e *FakeELBAPI) WaitUntilInstanceInService(input *goelb.DescribeInstanceHealthInput) error {
+func (e *FakeELBv1API) WaitUntilInstanceInService(input *goelb.DescribeInstanceHealthInput) error {
 	return e.FakeWaitUntilInstanceInService(input)
 }
 
-func (e *FakeELBAPI) DeregisterInstancesFromLoadBalancer(input *goelb.DeregisterInstancesFromLoadBalancerInput) (
+func (e *FakeELBv1API) DeregisterInstancesFromLoadBalancer(input *goelb.DeregisterInstancesFromLoadBalancerInput) (
 	*goelb.DeregisterInstancesFromLoadBalancerOutput, error) {
 	return e.FakeDeregisterInstancesFromLoadBalancer(input)
 }
 
-func (e *FakeELBAPI) WaitUntilInstanceDeregistered(input *goelb.DescribeInstanceHealthInput) error {
+func (e *FakeELBv1API) WaitUntilInstanceDeregistered(input *goelb.DescribeInstanceHealthInput) error {
 	return e.FakeWaitUntilInstanceDeregistered(input)
 }

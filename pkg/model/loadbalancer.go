@@ -32,8 +32,8 @@ func NewLoadBalancersByInstanceIDFromELBv1(descs []*goelb.LoadBalancerDescriptio
 	return lbs
 }
 
-// NewLoadBalancersFromALB creates the object of LoadBalancers from ALB.
-func NewLoadBalancersFromALB(loadBalancers []*elbv2.LoadBalancer,
+// NewLoadBalancersFromELBv2 creates the object of LoadBalancers from ELBv2.
+func NewLoadBalancersFromELBv2(loadBalancers []*elbv2.LoadBalancer,
 	loadBalancerArnToTargets map[string][]*elbv2.TargetDescription) LoadBalancers {
 	models := make(LoadBalancers, 0, len(loadBalancers))
 	for _, lb := range loadBalancers {
@@ -41,7 +41,7 @@ func NewLoadBalancersFromALB(loadBalancers []*elbv2.LoadBalancer,
 		if len(targets) == 0 {
 			continue
 		}
-		models = append(models, NewLoadBalancerFromALB(lb, targets))
+		models = append(models, NewLoadBalancerFromELBv2(lb, targets))
 	}
 	return models
 }
@@ -90,7 +90,7 @@ func NewLoadBalancer(desc *goelb.LoadBalancerDescription) *LoadBalancer {
 	}
 }
 
-func NewLoadBalancerFromALB(desc *elbv2.LoadBalancer, targets []*elbv2.TargetDescription) *LoadBalancer {
+func NewLoadBalancerFromELBv2(desc *elbv2.LoadBalancer, targets []*elbv2.TargetDescription) *LoadBalancer {
 	instances := make([]*Instance, 0, len(targets))
 	for _, target := range targets {
 		instances = append(instances, NewInstanceFromTarget(target))

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/yuuki/albio/pkg/alb"
 	"github.com/yuuki/albio/pkg/awsapi"
 	"github.com/yuuki/albio/pkg/ec2"
-	"github.com/yuuki/albio/pkg/elb"
+	"github.com/yuuki/albio/pkg/elbv1"
+	"github.com/yuuki/albio/pkg/elbv2"
 )
 
 type DetachParam struct {
@@ -31,13 +31,13 @@ func Detach(param *DetachParam) error {
 		}
 	}
 
-	elbClient := elb.New(sess)
+	elbClient := elbv1.New(sess)
 	elbs, err := elbClient.GetLoadBalancersFromInstanceID(instanceID)
 	if err != nil {
 		return err
 	}
 
-	albClient := alb.New(sess)
+	albClient := elbv2.New(sess)
 	albs, err := albClient.GetLoadBalancersFromInstanceID(instanceID)
 	if err != nil {
 		return err

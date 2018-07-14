@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/yuuki/albio/pkg/alb"
 	"github.com/yuuki/albio/pkg/awsapi"
 	"github.com/yuuki/albio/pkg/ec2"
-	"github.com/yuuki/albio/pkg/elb"
+	"github.com/yuuki/albio/pkg/elbv1"
+	"github.com/yuuki/albio/pkg/elbv2"
 )
 
 type AttachParam struct {
@@ -42,7 +42,7 @@ func Attach(param *AttachParam) error {
 			return fmt.Errorf("not found loadbalancers with %s. specify loadbalancer with --loadlalancer option", instanceID)
 		}
 
-		elbClient := elb.New(sess)
+		elbClient := elbv1.New(sess)
 		elbs, err := elbClient.GetLoadBalancersByNames(lbNames)
 		if err != nil {
 			return err
@@ -52,17 +52,17 @@ func Attach(param *AttachParam) error {
 			return err
 		}
 
-		albClient := alb.New(sess)
-		albs, err := albClient.GetLoadBalancersByNames(lbNames)
+		elbv2Client := elbv2.New(sess)
+		albs, err := elbv2Client.GetLoadBalancersByNames(lbNames)
 		if err != nil {
 			return err
 		}
 		log.Println("-->", "Attaching", instanceID, "to", albs)
-		if err := albClient.AddInstanceToLoadBalancers(instanceID, albs); err != nil {
+		if err := elbv2Client.AddInstanceToLoadBalancers(instanceID, albs); err != nil {
 			return err
 		}
 	} else {
-		elbClient := elb.New(sess)
+		elbClient := elbv1.New(sess)
 		elbs, err := elbClient.GetLoadBalancersByNames([]string{param.LoadBalancerName})
 		if err != nil {
 			return err
@@ -72,7 +72,7 @@ func Attach(param *AttachParam) error {
 			return err
 		}
 
-		albClient := alb.New(sess)
+		albClient := elbv2.New(sess)
 		albs, err := albClient.GetLoadBalancersByNames([]string{param.LoadBalancerName})
 		if err != nil {
 			return err

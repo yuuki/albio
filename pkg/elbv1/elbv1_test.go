@@ -1,4 +1,4 @@
-package elb
+package elbv1
 
 import (
 	"testing"
@@ -11,7 +11,7 @@ import (
 )
 
 func TestGetLoadBalancersFromInstanceID(t *testing.T) {
-	fakeSvc := &awsapi.FakeELBAPI{
+	fakeSvc := &awsapi.FakeELBv1API{
 		FakeDescribeLoadBalancers: func(input *goelb.DescribeLoadBalancersInput) (*goelb.DescribeLoadBalancersOutput, error) {
 			return &goelb.DescribeLoadBalancersOutput{
 				LoadBalancerDescriptions: []*goelb.LoadBalancerDescription{
@@ -43,7 +43,7 @@ func TestGetLoadBalancersFromInstanceID(t *testing.T) {
 			}, nil
 		},
 	}
-	obj := &_elb{svc: fakeSvc}
+	obj := &_elbv1{svc: fakeSvc}
 	got, err := obj.GetLoadBalancersFromInstanceID("albioinstance01-id")
 	if err != nil {
 		t.Errorf("should not raise error: %v", err)
@@ -72,7 +72,7 @@ func TestGetLoadBalancersFromInstanceID(t *testing.T) {
 }
 
 func TestGetLoadBalancersByNames(t *testing.T) {
-	fakeSvc := &awsapi.FakeELBAPI{
+	fakeSvc := &awsapi.FakeELBv1API{
 		FakeDescribeLoadBalancers: func(input *goelb.DescribeLoadBalancersInput) (*goelb.DescribeLoadBalancersOutput, error) {
 			expected := []*string{aws.String("albiolb01"), aws.String("albiolb02")}
 			if diff := pretty.Compare(input.LoadBalancerNames, expected); diff != "" {
@@ -94,7 +94,7 @@ func TestGetLoadBalancersByNames(t *testing.T) {
 			}, nil
 		},
 	}
-	obj := &_elb{svc: fakeSvc}
+	obj := &_elbv1{svc: fakeSvc}
 	got, err := obj.GetLoadBalancersByNames([]string{"albiolb01", "albiolb02"})
 	if err != nil {
 		t.Errorf("should not raise error: %v", err)
@@ -117,7 +117,7 @@ func TestGetLoadBalancersByNames(t *testing.T) {
 }
 
 func TestAddInstanceToLoadBalancers(t *testing.T) {
-	fakeSvc := &awsapi.FakeELBAPI{
+	fakeSvc := &awsapi.FakeELBv1API{
 		FakeRegisterInstancesWithLoadBalancer: func(input *goelb.RegisterInstancesWithLoadBalancerInput) (
 			*goelb.RegisterInstancesWithLoadBalancerOutput, error) {
 			return &goelb.RegisterInstancesWithLoadBalancerOutput{}, nil
@@ -126,7 +126,7 @@ func TestAddInstanceToLoadBalancers(t *testing.T) {
 			return nil
 		},
 	}
-	obj := &_elb{svc: fakeSvc}
+	obj := &_elbv1{svc: fakeSvc}
 	err := obj.AddInstanceToLoadBalancers("albioinstance01-id", model.LoadBalancers{
 		{
 			Name:      "albiolb01",
@@ -140,7 +140,7 @@ func TestAddInstanceToLoadBalancers(t *testing.T) {
 }
 
 func TestRemoveInstanceToLoadBalancers(t *testing.T) {
-	fakeSvc := &awsapi.FakeELBAPI{
+	fakeSvc := &awsapi.FakeELBv1API{
 		FakeDeregisterInstancesFromLoadBalancer: func(input *goelb.DeregisterInstancesFromLoadBalancerInput) (
 			*goelb.DeregisterInstancesFromLoadBalancerOutput, error) {
 			return &goelb.DeregisterInstancesFromLoadBalancerOutput{}, nil
@@ -149,7 +149,7 @@ func TestRemoveInstanceToLoadBalancers(t *testing.T) {
 			return nil
 		},
 	}
-	obj := &_elb{svc: fakeSvc}
+	obj := &_elbv1{svc: fakeSvc}
 	err := obj.RemoveInstanceFromLoadBalancers("albioinstance01-id", model.LoadBalancers{
 		{
 			Name:      "albiolb01",

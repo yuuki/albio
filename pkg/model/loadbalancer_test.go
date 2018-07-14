@@ -38,8 +38,8 @@ func TestNewLoadBalancers(t *testing.T) {
 	}
 }
 
-func TestNewLoadBalancersByInstanceID(t *testing.T) {
-	got := NewLoadBalancersByInstanceID([]*goelb.LoadBalancerDescription{
+func TestNewLoadBalancersByInstanceIDFromELBv1(t *testing.T) {
+	got := NewLoadBalancersByInstanceIDFromELBv1([]*goelb.LoadBalancerDescription{
 		{
 			LoadBalancerName: aws.String("albio-gotest01"),
 			DNSName:          aws.String("albio-gotest01.ap-northeast-1.elb.amazonaws.com"),
@@ -63,8 +63,8 @@ func TestNewLoadBalancersByInstanceID(t *testing.T) {
 	}
 }
 
-func TestNewLoadBalancersByInstanceID_NotExistsInstance(t *testing.T) {
-	got := NewLoadBalancersByInstanceID([]*goelb.LoadBalancerDescription{
+func TestNewLoadBalancersByInstanceIDFromELBv1_NotExistsInstance(t *testing.T) {
+	got := NewLoadBalancersByInstanceIDFromELBv1([]*goelb.LoadBalancerDescription{
 		{
 			LoadBalancerName: aws.String("albio-gotest01"),
 			DNSName:          aws.String("albio-gotest01.ap-northeast-1.elb.amazonaws.com"),

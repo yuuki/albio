@@ -1,4 +1,4 @@
-package alb
+package elbv2
 
 import (
 	"github.com/aws/aws-sdk-go/aws"
@@ -8,24 +8,24 @@ import (
 	"github.com/yuuki/albio/pkg/model"
 )
 
-type ALB interface {
+type ELBv2 interface {
 	GetLoadBalancersFromInstanceID(string) (model.LoadBalancers, error)
 	GetLoadBalancersByNames([]string) (model.LoadBalancers, error)
 	AddInstanceToLoadBalancers(string, model.LoadBalancers) error
 	RemoveInstanceFromLoadBalancers(string, model.LoadBalancers) error
 }
 
-type _alb struct {
-	svc awsapi.ALBAPI
+type _elbv2 struct {
+	svc awsapi.ELBv2API
 }
 
-func New(sess *session.Session) ALB {
-	return &_alb{
+func New(sess *session.Session) ELBv2 {
+	return &_elbv2{
 		svc: elbv2.New(sess),
 	}
 }
 
-func (a *_alb) GetLoadBalancersFromInstanceID(instanceID string) (model.LoadBalancers, error) {
+func (a *_elbv2) GetLoadBalancersFromInstanceID(instanceID string) (model.LoadBalancers, error) {
 	groupResp, err := a.svc.DescribeTargetGroups(&elbv2.DescribeTargetGroupsInput{})
 	if err != nil {
 		return nil, err
@@ -69,11 +69,11 @@ func (a *_alb) GetLoadBalancersFromInstanceID(instanceID string) (model.LoadBala
 		return nil, err
 	}
 
-	return model.NewLoadBalancersFromALB(resp.LoadBalancers, loadBalancerArnToTargets), nil
+	return model.NewLoadBalancersFromELBv2(resp.LoadBalancers, loadBalancerArnToTargets), nil
 }
 
 // GetLoadBalancersByNames finds LoadBalancers by loadbalancer name.
-func (a *_alb) GetLoadBalancersByNames(lbNames []string) (model.LoadBalancers, error) {
+func (a *_elbv2) GetLoadBalancersByNames(lbNames []string) (model.LoadBalancers, error) {
 	loadbalancers, groups, err := a.findLoadBalancersAndTargetGroupsByLoadBalancerNames(lbNames)
 	if err != nil {
 		return nil, err
@@ -97,10 +97,10 @@ func (a *_alb) GetLoadBalancersByNames(lbNames []string) (model.LoadBalancers, e
 		}
 	}
 
-	return model.NewLoadBalancersFromALB(loadbalancers, loadBalancerArnToTargets), nil
+	return model.NewLoadBalancersFromELBv2(loadbalancers, loadBalancerArnToTargets), nil
 }
 
-func (a *_alb) AddInstanceToLoadBalancers(instanceID string, lbs model.LoadBalancers) error {
+func (a *_elbv2) AddInstanceToLoadBalancers(instanceID string, lbs model.LoadBalancers) error {
 	_, groups, err := a.findLoadBalancersAndTargetGroupsByLoadBalancerNames(lbs.NameSlice())
 	if err != nil {
 		return err
@@ -122,7 +122,7 @@ func (a *_alb) AddInstanceToLoadBalancers(instanceID string, lbs model.LoadBalan
 	return nil
 }
 
-func (a *_alb) RemoveInstanceFromLoadBalancers(instanceID string, lbs model.LoadBalancers) error {
+func (a *_elbv2) RemoveInstanceFromLoadBalancers(instanceID string, lbs model.LoadBalancers) error {
 	_, groups, err := a.findLoadBalancersAndTargetGroupsByLoadBalancerNames(lbs.NameSlice())
 	if err != nil {
 		return err
@@ -144,7 +144,7 @@ func (a *_alb) RemoveInstanceFromLoadBalancers(instanceID string, lbs model.Load
 	return nil
 }
 
-func (a *_alb) findLoadBalancersAndTargetGroupsByLoadBalancerNames(lbNames []string) ([]*elbv2.LoadBalancer, []*elbv2.TargetGroup, error) {
+func (a *_elbv2) findLoadBalancersAndTargetGroupsByLoadBalancerNames(lbNames []string) ([]*elbv2.LoadBalancer, []*elbv2.TargetGroup, error) {
 	names := make([]*string, 0, len(lbNames))
 	for _, n := range lbNames {
 		names = append(names, aws.String(n))

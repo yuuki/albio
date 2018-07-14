@@ -4,8 +4,8 @@ import (
 	goelb "github.com/aws/aws-sdk-go/service/elb"
 )
 
-// ELBAPI defines the interface for ELB API stubbing.
-type ELBAPI interface {
+// ELBv1API defines the interface for ELB API stubbing.
+type ELBv1API interface {
 	DescribeLoadBalancers(*goelb.DescribeLoadBalancersInput) (*goelb.DescribeLoadBalancersOutput, error)
 	RegisterInstancesWithLoadBalancer(*goelb.RegisterInstancesWithLoadBalancerInput) (*goelb.RegisterInstancesWithLoadBalancerOutput, error)
 	WaitUntilInstanceInService(*goelb.DescribeInstanceHealthInput) error
