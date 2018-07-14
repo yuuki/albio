@@ -1,6 +1,6 @@
 COMMIT = $$(git describe --always)
 PKG = github.com/yuuki/albio
-PKGS = $$(go list ./... | grep -v vendor)
+PKGS = $$(go list ./...)
 CREDITS = CREDITS
 
 all: build
