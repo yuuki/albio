@@ -60,8 +60,12 @@ func (cli *CLI) Run(args []string) int {
 	}
 
 	if err != nil {
-		fmt.Fprintln(cli.errStream, err)
-		return 2
+		if os.Getenv("ALBIO_DEBUG") != "" {
+			fmt.Fprintf(cli.errStream, "%+v\n", err)
+		} else {
+			fmt.Fprintln(cli.errStream, err)
+		}
+		return exitCodeErr
 	}
 
 	return 0
