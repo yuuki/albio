@@ -10,6 +10,11 @@ import (
 	"github.com/yuuki/albio/pkg/command"
 )
 
+const (
+	exitCodeOK  = 0
+	exitCodeErr = 10 + iota
+)
+
 var (
 	creditsText = string(MustAsset("CREDITS"))
 )
@@ -30,7 +35,7 @@ func main() {
 func (cli *CLI) Run(args []string) int {
 	if len(args) <= 1 {
 		fmt.Fprint(cli.errStream, helpText)
-		return 2
+		return exitCodeErr
 	}
 
 	var err error
@@ -44,14 +49,14 @@ func (cli *CLI) Run(args []string) int {
 		err = cli.doDetach(args[2:])
 	case "-v", "--version":
 		fmt.Fprintf(cli.errStream, "%s version %s, build %s \n", Name, Version, GitCommit)
-		return 0
+		return exitCodeOK
 	case "-h", "--help":
 		fmt.Fprint(cli.errStream, helpText)
 	case "--credits":
 		fmt.Fprint(cli.errStream, creditsText)
 	default:
 		fmt.Fprint(cli.errStream, helpText)
-		return 1
+		return exitCodeErr
 	}
 
 	if err != nil {
