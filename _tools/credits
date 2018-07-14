@@ -5,7 +5,7 @@ ROOT=$(dirname "${BASH_SOURCE}")/..
 cd "${ROOT}"
 
 echo '=========================================================================================='
-echo "= lstf licensed under: ="
+echo "= albio licensed under: ="
 echo "https://github.com/yuuki/albio/"
 echo
 cat "${ROOT}"/LICENSE

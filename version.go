@@ -1,11 +1,13 @@
 package main
 
-// Name is application name
-const Name = "albio"
+// name is application name.
+const name = "albio"
 
-// Version is application version
-const Version string = "0.1.0"
+// version is application version.
+const version = "0.1.0"
 
-// GitCommit describes latest commit hash.
+// commit describes latest git commit hash.
 // This is automatically extracted by git describe --always.
-var GitCommit string
+var commit string
+
+var date string

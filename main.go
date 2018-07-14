@@ -47,8 +47,8 @@ func (cli *CLI) Run(args []string) int {
 		err = cli.doAttach(args[2:])
 	case "detach":
 		err = cli.doDetach(args[2:])
-	case "-v", "--version":
-		fmt.Fprintf(cli.errStream, "%s version %s, build %s \n", Name, Version, GitCommit)
+	case "--version":
+		fmt.Fprintf(cli.errStream, "%s version %s, build %s, date %s \n", name, version, commit, date)
 		return exitCodeOK
 	case "-h", "--help":
 		fmt.Fprint(cli.errStream, helpText)
@@ -83,7 +83,7 @@ Options:
 `
 
 func (cli *CLI) prepareFlags(help string) *flag.FlagSet {
-	flags := flag.NewFlagSet(Name, flag.ContinueOnError)
+	flags := flag.NewFlagSet(name, flag.ContinueOnError)
 	flags.SetOutput(cli.errStream)
 	flags.Usage = func() {
 		fmt.Fprint(cli.errStream, help)
