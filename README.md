@@ -31,10 +31,10 @@ $ albio status
 
 ```shell
 $ sudo mkdir -m 777 -p /var/lib/albio
-$ albio detach > /var/lib/albio/loadbalancers.json
+$ albio detach --self > /var/lib/albio/loadbalancers.json
 --> Detaching i-xxxxxxxxxxxxxxxxx from albtest001
 $ # something to restart command
-$ cat /var/lib/albio/loadbalancers.json | albio attach
+$ cat /var/lib/albio/loadbalancers.json | albio attach --self
 --> Attaching i-0f5ffb9f0a75e6b85 to albtest001
 ```
 

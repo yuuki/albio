@@ -13,28 +13,31 @@ import (
 
 type AttachParam struct {
 	InstanceID       string
+	Self             bool
 	LoadBalancerName string
 }
 
 func Attach(param *AttachParam) error {
+	if param.InstanceID == "" && !param.Self {
+		log.Println("require either --instance-id or --self option.")
+	}
+
 	sess, err := awsapi.Session()
 	if err != nil {
 		return err
 	}
 
 	ec2Client := ec2.New(sess)
+	elbv2Client := elbv2.New(sess)
 
 	var instanceID string
-	if param.InstanceID == "" {
+	if param.Self {
 		var err error
 		instanceID, err = ec2Client.GetLocalInstanceID()
 		if err != nil {
 			return err
 		}
-	}
 
-	elbv2Client := elbv2.New(sess)
-	if param.LoadBalancerName == "" {
 		lbs, err := storage.LoadLoadBalancers(os.Stdin, instanceID)
 		if err != nil {
 			return err
@@ -56,7 +59,9 @@ func Attach(param *AttachParam) error {
 		if err := elbv2Client.AddInstanceToLoadBalancers(instanceID, albs); err != nil {
 			return err
 		}
-	} else {
+	}
+
+	if param.LoadBalancerName != "" {
 		albs, err := elbv2Client.GetLoadBalancersByNames([]string{param.LoadBalancerName})
 		if err != nil {
 			return err

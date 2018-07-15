@@ -121,7 +121,8 @@ Usage: albio attach [options]
 attach loadbalancers to the EC2 instance.
 
 Options:
-  --instance-id, -i	specify EC2 instance id
+  --instance-id, -i		specify EC2 instance id
+  --self				use localhost as EC2 instance
   --loadbalancer, -l	specify ALB/NLB name or ARN
 `
 
@@ -130,6 +131,7 @@ func (cli *CLI) doAttach(args []string) error {
 	flags := cli.prepareFlags(attachHelpText)
 	flags.StringVar(&param.InstanceID, "i", "", "")
 	flags.StringVar(&param.InstanceID, "instance-id", "", "")
+	flags.BoolVar(&param.Self, "self", false, "")
 	flags.StringVar(&param.LoadBalancerName, "l", "", "")
 	flags.StringVar(&param.LoadBalancerName, "loadbalancer", "", "")
 	if err := flags.Parse(args); err != nil {
@@ -144,7 +146,8 @@ Usage: albio detach [options]
 detach loadbalancers from the EC2 instance.
 
 Options:
-  --instance-id, -i	specify EC2 instance id
+  --instance-id, -i		specify EC2 instance id
+  --self            	use localhost as EC2 instance
 `
 
 func (cli *CLI) doDetach(args []string) error {
@@ -152,6 +155,7 @@ func (cli *CLI) doDetach(args []string) error {
 	flags := cli.prepareFlags(detachHelpText)
 	flags.StringVar(&param.InstanceID, "i", "", "")
 	flags.StringVar(&param.InstanceID, "instance-id", "", "")
+	flags.BoolVar(&param.Self, "self", false, "")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}

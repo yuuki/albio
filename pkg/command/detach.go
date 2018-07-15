@@ -1,6 +1,7 @@
 package command
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -13,9 +14,14 @@ import (
 
 type DetachParam struct {
 	InstanceID string
+	Self       bool
 }
 
 func Detach(param *DetachParam) error {
+	if param.InstanceID == "" && !param.Self {
+		return errors.New("require either --instance-id or --self option.")
+	}
+
 	sess, err := awsapi.Session()
 	if err != nil {
 		return err
@@ -24,7 +30,7 @@ func Detach(param *DetachParam) error {
 	ec2Client := ec2.New(sess)
 
 	var instanceID string
-	if param.InstanceID == "" {
+	if param.Self {
 		var err error
 		instanceID, err = ec2Client.GetLocalInstanceID()
 		if err != nil {
