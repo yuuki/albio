@@ -3,34 +3,11 @@ package model
 import (
 	"strings"
 
-	goelb "github.com/aws/aws-sdk-go/service/elb"
 	"github.com/aws/aws-sdk-go/service/elbv2"
 )
 
 // LoadBalancers represents an slice of loadbalancer.
 type LoadBalancers []*LoadBalancer
-
-// NewLoadBalancers creates the object of LoadBalancers from the slice of elb.LoadBalancerDescription.
-func NewLoadBalancers(descs []*goelb.LoadBalancerDescription) LoadBalancers {
-	var lbs LoadBalancers
-	for _, desc := range descs {
-		lbs = append(lbs, NewLoadBalancer(desc))
-	}
-	return lbs
-}
-
-// NewLoadBalancersByInstanceIDFromELBv1 creates the object of LoadBalancers from elb.LoadBalancerDescription.
-func NewLoadBalancersByInstanceIDFromELBv1(descs []*goelb.LoadBalancerDescription, instanceID string) LoadBalancers {
-	var lbs LoadBalancers
-	for _, desc := range descs {
-		for _, instance := range desc.Instances {
-			if *instance.InstanceId == instanceID {
-				lbs = append(lbs, NewLoadBalancer(desc))
-			}
-		}
-	}
-	return lbs
-}
 
 // NewLoadBalancersFromELBv2 creates the object of LoadBalancers from ELBv2.
 func NewLoadBalancersFromELBv2(loadBalancers []*elbv2.LoadBalancer,
@@ -75,19 +52,6 @@ type LoadBalancer struct {
 	Name      string      `json:"name"`
 	DNSName   string      `json:"dnsname"`
 	Instances []*Instance `json:"instances"`
-}
-
-// NewLoadBalancer creates a LoadBalancer object from elb.LoadBalancerDescription.
-func NewLoadBalancer(desc *goelb.LoadBalancerDescription) *LoadBalancer {
-	instances := make([]*Instance, 0, len(desc.Instances))
-	for _, instance := range desc.Instances {
-		instances = append(instances, NewInstance(instance))
-	}
-	return &LoadBalancer{
-		Name:      *desc.LoadBalancerName,
-		DNSName:   *desc.DNSName,
-		Instances: instances,
-	}
 }
 
 func NewLoadBalancerFromELBv2(desc *elbv2.LoadBalancer, targets []*elbv2.TargetDescription) *LoadBalancer {
