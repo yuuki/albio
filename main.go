@@ -74,7 +74,7 @@ func (cli *CLI) Run(args []string) int {
 var helpText = `
 Usage: albio [options]
 
-  A CLI tool to service in/out from AWS Loadbalancer such as ELB/ALB.
+  A CLI tool to service in/out from AWS Loadbalancer such as ALB/NLB.
 
 Commands:
   status	show loadbalancers information.
@@ -122,7 +122,7 @@ attach loadbalancers to the EC2 instance.
 
 Options:
   --instance-id, -i	specify EC2 instance id
-  --loadbalancer, -l	specify ALB/ELB name or ARN
+  --loadbalancer, -l	specify ALB/NLB name or ARN
 `
 
 func (cli *CLI) doAttach(args []string) error {

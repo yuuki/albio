@@ -7,7 +7,6 @@ import (
 
 	"github.com/yuuki/albio/pkg/awsapi"
 	"github.com/yuuki/albio/pkg/ec2"
-	"github.com/yuuki/albio/pkg/elbv1"
 	"github.com/yuuki/albio/pkg/elbv2"
 )
 
@@ -30,16 +29,10 @@ func Status(param *StatusParam) error {
 		}
 	}
 
-	elbs, err := elbv1.New(sess).GetLoadBalancersFromInstanceID(instanceID)
+	lbs, err := elbv2.New(sess).GetLoadBalancersFromInstanceID(instanceID)
 	if err != nil {
 		return err
 	}
-
-	albs, err := elbv2.New(sess).GetLoadBalancersFromInstanceID(instanceID)
-	if err != nil {
-		return err
-	}
-	lbs := append(elbs, albs...)
 
 	b, err := json.MarshalIndent(lbs, "", "    ")
 	if err != nil {
