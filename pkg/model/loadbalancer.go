@@ -51,6 +51,9 @@ func (lbs LoadBalancers) NamePointerSlice() []*string {
 type LoadBalancer struct {
 	Name      string      `json:"name"`
 	DNSName   string      `json:"dnsname"`
+	Arn       string      `json:"arn"`
+	Type      string      `json:"type"`
+	Scheme    string      `json:"scheme"`
 	Instances []*Instance `json:"instances"`
 }
 
@@ -62,6 +65,9 @@ func NewLoadBalancerFromELBv2(desc *elbv2.LoadBalancer, targets []*elbv2.TargetD
 	return &LoadBalancer{
 		Name:      *desc.LoadBalancerName,
 		DNSName:   *desc.DNSName,
+		Arn:       *desc.LoadBalancerArn,
+		Type:      *desc.Type,
+		Scheme:    *desc.Scheme,
 		Instances: instances,
 	}
 }
