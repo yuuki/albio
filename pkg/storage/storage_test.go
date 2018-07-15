@@ -23,7 +23,7 @@ func TestSaveLoadBalancers(t *testing.T) {
 		{
 			Name:    "albiotestnlb01",
 			DNSName: "albiotestnlb01-2a3abff5251f4a60.elb.ap-northeast-1.amazonaws.com",
-			Arn:     "arn:aws:elasticloadbalancing:ap-northeast-1:962625566896:targetgroup/albiotestalb01/3057e052ca8ea602",
+			Arn:     "arn:aws:elasticloadbalancing:ap-northeast-1:962625566896:targetgroup/albiotestnlb01/3057e052ca8ea602",
 			Type:    "network",
 			Scheme:  "internet-facing",
 		},
@@ -32,7 +32,8 @@ func TestSaveLoadBalancers(t *testing.T) {
 		t.Fatalf("is should not raise error:%s", err)
 	}
 
-	want := `{"loadbalancers":[{"arn":"arn:aws:elasticloadbalancing:ap-northeast-1:962625566896:targetgroup/albiotestalb01/3057e052ca8ea602","type":"application"},{"arn":"arn:aws:elasticloadbalancing:ap-northeast-1:962625566896:targetgroup/albiotestalb01/3057e052ca8ea602","type":"network"}],"instance-id":"i-0f5ffb9f0a75e6b85"}`
+	want := `{"loadbalancers":[{"name":"albiotestalb01","arn":"arn:aws:elasticloadbalancing:ap-northeast-1:962625566896:targetgroup/albiotestalb01/3057e052ca8ea602","type":"application"},{"name":"albiotestnlb01","arn":"arn:aws:elasticloadbalancing:ap-northeast-1:962625566896:targetgroup/albiotestnlb01/3057e052ca8ea602","type":"network"}],"instance-id":"i-0f5ffb9f0a75e6b85"}
+`
 	if out.String() != want {
 		t.Errorf("got: %v, want: %v", out.String(), want)
 	}
@@ -40,21 +41,23 @@ func TestSaveLoadBalancers(t *testing.T) {
 
 func TestLoadLoadBalancers(t *testing.T) {
 	in := strings.NewReader(`
-{"loadbalancers":[{"arn":"arn:aws:elasticloadbalancing:ap-northeast-1:962625566896:targetgroup/albiotestalb01/3057e052ca8ea602","type":"application"},{"arn":"arn:aws:elasticloadbalancing:ap-northeast-1:962625566896:targetgroup/albiotestalb01/3057e052ca8ea602","type":"network"}],"instance-id":"i-0f5ffb9f0a75e6b85"}
+{"loadbalancers":[{"name":"albiotestalb01","arn":"arn:aws:elasticloadbalancing:ap-northeast-1:962625566896:targetgroup/albiotestalb01/3057e052ca8ea602","type":"application"},{"name":"albiotestnlb01","arn":"arn:aws:elasticloadbalancing:ap-northeast-1:962625566896:targetgroup/albiotestnlb01/3057e052ca8ea602","type":"network"}],"instance-id":"i-0f5ffb9f0a75e6b85"}
 `)
 
-	got, err := LoadLoadBalancers(in)
+	got, err := LoadLoadBalancers(in, "i-0f5ffb9f0a75e6b85")
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
 
 	want := []LoadBalancer{
 		{
+			Name: "albiotestalb01",
 			Arn:  "arn:aws:elasticloadbalancing:ap-northeast-1:962625566896:targetgroup/albiotestalb01/3057e052ca8ea602",
 			Type: "application",
 		},
 		{
-			Arn:  "arn:aws:elasticloadbalancing:ap-northeast-1:962625566896:targetgroup/albiotestalb01/3057e052ca8ea602",
+			Name: "albiotestnlb01",
+			Arn:  "arn:aws:elasticloadbalancing:ap-northeast-1:962625566896:targetgroup/albiotestnlb01/3057e052ca8ea602",
 			Type: "network",
 		},
 	}
