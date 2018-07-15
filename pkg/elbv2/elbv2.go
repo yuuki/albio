@@ -19,6 +19,7 @@ type _elbv2 struct {
 	svc awsapi.ELBv2API
 }
 
+// New creates an ELBv2 client.
 func New(sess *session.Session) ELBv2 {
 	return &_elbv2{
 		svc: elbv2.New(sess),

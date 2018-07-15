@@ -3,10 +3,12 @@ package command
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/yuuki/albio/pkg/awsapi"
 	"github.com/yuuki/albio/pkg/ec2"
 	"github.com/yuuki/albio/pkg/elbv2"
+	"github.com/yuuki/albio/pkg/storage"
 )
 
 type DetachParam struct {
@@ -40,7 +42,7 @@ func Detach(param *DetachParam) error {
 		return fmt.Errorf("%v is not attached any loadbalancers", instanceID)
 	}
 
-	if err := ec2Client.SaveLoadBalancersToTag(instanceID, lbs.NameSlice()); err != nil {
+	if err := storage.SaveLoadBalancers(os.Stdout, instanceID, lbs); err != nil {
 		return err
 	}
 
