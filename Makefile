@@ -42,7 +42,11 @@ crossbuild: devel-deps credits
 	goxz -pv=v$(ver) -os=linux,darwin -arch=386,amd64 -build-ldflags="$(RELEASE_BUILD_LDFLAGS)" \
 	  -d=./dist/v$(ver)
 
-.PHONY: release
-release: devel-deps crossbuild
+.PHONY: _release
+_release: devel-deps
 	_tools/release
+
+upload_artifacts: devel-deps
 	_tools/upload_artifacts
+
+release: crossbuild _release upload_artifacts

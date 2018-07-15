@@ -2,5 +2,4 @@
 set -e
 
 ver=v$(gobump show -r)
-make crossbuild
 ghr -username yuuki -replace ${ver} dist/${ver}
