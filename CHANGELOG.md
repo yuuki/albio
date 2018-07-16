@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.1.1](https://github.com/yuuki/albio/compare/v0.1.0...v0.1.1) (2018-07-16)
+
+
 ## [v0.1.0](https://github.com/yuuki/albio/compare/...v0.1.0) (2018-07-16)
 
 * Add --self option [#9](https://github.com/yuuki/albio/pull/9) ([yuuki](https://github.com/yuuki))
