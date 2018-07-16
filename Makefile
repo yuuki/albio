@@ -47,4 +47,4 @@ _release: devel-deps
 upload_artifacts: devel-deps
 	_tools/upload_artifacts
 
-release: crossbuild _release upload_artifacts
+release: _release crossbuild upload_artifacts
