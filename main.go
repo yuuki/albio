@@ -125,7 +125,7 @@ attach the EC2 instance to the loadbalancers.
 Options:
   --instance-id, -i		specify EC2 instance id
   --self				use localhost as EC2 instance
-  --loadbalancer, -l	specify ALB/NLB name or ARN
+  --loadbalancer, -l	specify ALB/NLB name
 `
 
 func (cli *CLI) doAttach(args []string) error {
