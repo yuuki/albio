@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.2.0](https://github.com/yuuki/albio/compare/v0.1.1...v0.2.0) (2018-07-16)
+
+* Wait until registred or deregisterd instance to the loadbalancer [#10](https://github.com/yuuki/albio/pull/10) ([yuuki](https://github.com/yuuki))
+
 ## [v0.1.1](https://github.com/yuuki/albio/compare/v0.1.0...v0.1.1) (2018-07-16)
 
 * Fix bug that 'attach --loadbalancer-name' is not working
