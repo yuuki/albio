@@ -1,4 +1,13 @@
 # albio
+[![Latest Version](http://img.shields.io/github/release/yuuki/albio.svg?style=flat-square)][release]
+[![Build Status](http://img.shields.io/travis/yuuki/albio.svg?style=flat-square)][travis]
+[![Go Report Card](https://goreportcard.com/badge/github.com/yuuki/albio)][goreport]
+[![License](http://img.shields.io/:license-mit-blue.svg)][license]
+[release]: https://github.com/yuuki/albio/releases
+[travis]: http://travis-ci.org/yuuki/albio
+[godocs]: http://godoc.org/github.com/yuuki/albio
+[goreport]: https://goreportcard.com/report/github.com/yuuki/albio
+[license]: http://doge.mit-license.org
 
 A CLI tool to gracefully manage EC2 instances on ALB/NLB.
 
