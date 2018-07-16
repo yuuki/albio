@@ -52,8 +52,10 @@ func (cli *CLI) Run(args []string) int {
 		return exitCodeOK
 	case "-h", "--help":
 		fmt.Fprint(cli.errStream, helpText)
+		return exitCodeOK
 	case "--credits":
 		fmt.Fprint(cli.errStream, creditsText)
+		return exitCodeOK
 	default:
 		fmt.Fprint(cli.errStream, helpText)
 		return exitCodeErr
@@ -71,19 +73,19 @@ func (cli *CLI) Run(args []string) int {
 	return 0
 }
 
-var helpText = `
-Usage: albio [options]
+var helpText = `Usage: albio [options]
 
   A CLI tool to service in/out from AWS Loadbalancer such as ALB/NLB.
 
 Commands:
   status	show loadbalancers information.
-  attach        attach the instance from loadbalancer. It is not possible to specify --detach option if --attach option is specified.
-  detach        detach the instance from loadbalancer. It is not possible to specify --attach option if --detach option is specified.
+  attach    attach the EC2 instance to the loadbalancers.
+  detach 	detach the EC2 instance from the loadbalancers.
 
 Options:
   --version, -v		print version
-  --help, -h            print help
+  --credits         print credits
+  --help, -h		print help
 `
 
 func (cli *CLI) prepareFlags(help string) *flag.FlagSet {
@@ -118,7 +120,7 @@ func (cli *CLI) doStatus(args []string) error {
 var attachHelpText = `
 Usage: albio attach [options]
 
-attach loadbalancers to the EC2 instance.
+attach the EC2 instance to the loadbalancers.
 
 Options:
   --instance-id, -i		specify EC2 instance id
@@ -143,7 +145,7 @@ func (cli *CLI) doAttach(args []string) error {
 var detachHelpText = `
 Usage: albio detach [options]
 
-detach loadbalancers from the EC2 instance.
+detach the EC2 instance from the loadbalancers.
 
 Options:
   --instance-id, -i		specify EC2 instance id
