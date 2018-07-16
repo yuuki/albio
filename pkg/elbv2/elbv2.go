@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/yuuki/albio/pkg/awsapi"
 	"github.com/yuuki/albio/pkg/model"
+	"golang.org/x/sync/errgroup"
 )
 
 type ELBv2 interface {
@@ -107,20 +108,25 @@ func (a *_elbv2) AddInstanceToLoadBalancers(instanceID string, lbs model.LoadBal
 		return err
 	}
 
+	eg := errgroup.Group{}
 	for _, group := range groups {
-		_, err := a.svc.RegisterTargets(&elbv2.RegisterTargetsInput{
-			TargetGroupArn: group.TargetGroupArn,
-			Targets: []*elbv2.TargetDescription{
-				{Id: aws.String(instanceID)},
-			},
+		grp := group
+		eg.Go(func() error {
+			targets := []*elbv2.TargetDescription{{Id: aws.String(instanceID)}}
+			_, err := a.svc.RegisterTargets(&elbv2.RegisterTargetsInput{
+				TargetGroupArn: group.TargetGroupArn,
+				Targets:        targets,
+			})
+			if err != nil {
+				return err
+			}
+			return a.svc.WaitUntilTargetInService(&elbv2.DescribeTargetHealthInput{
+				TargetGroupArn: grp.TargetGroupArn,
+				Targets:        targets,
+			})
 		})
-		if err != nil {
-			return err
-		}
-		// TODO WaitUntilInstanceInService
 	}
-
-	return nil
+	return eg.Wait()
 }
 
 func (a *_elbv2) RemoveInstanceFromLoadBalancers(instanceID string, lbs model.LoadBalancers) error {
@@ -129,20 +135,25 @@ func (a *_elbv2) RemoveInstanceFromLoadBalancers(instanceID string, lbs model.Lo
 		return err
 	}
 
+	eg := errgroup.Group{}
 	for _, group := range groups {
-		_, err := a.svc.DeregisterTargets(&elbv2.DeregisterTargetsInput{
-			TargetGroupArn: group.TargetGroupArn,
-			Targets: []*elbv2.TargetDescription{
-				{Id: aws.String(instanceID)},
-			},
+		grp := group
+		eg.Go(func() error {
+			targets := []*elbv2.TargetDescription{{Id: aws.String(instanceID)}}
+			_, err := a.svc.DeregisterTargets(&elbv2.DeregisterTargetsInput{
+				TargetGroupArn: group.TargetGroupArn,
+				Targets:        targets,
+			})
+			if err != nil {
+				return err
+			}
+			return a.svc.WaitUntilTargetDeregistered(&elbv2.DescribeTargetHealthInput{
+				TargetGroupArn: grp.TargetGroupArn,
+				Targets:        targets,
+			})
 		})
-		if err != nil {
-			return err
-		}
-		// TODO WaitUntilInstanceDeregistered
 	}
-
-	return nil
+	return eg.Wait()
 }
 
 func (a *_elbv2) findLoadBalancersAndTargetGroupsByLoadBalancerNames(lbNames []string) ([]*elbv2.LoadBalancer, []*elbv2.TargetGroup, error) {
