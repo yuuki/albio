@@ -37,7 +37,9 @@ func Attach(param *AttachParam) error {
 		if err != nil {
 			return err
 		}
+	}
 
+	if param.LoadBalancerName == "" {
 		lbs, err := storage.LoadLoadBalancers(os.Stdin, instanceID)
 		if err != nil {
 			return err
@@ -59,9 +61,7 @@ func Attach(param *AttachParam) error {
 		if err := elbv2Client.AddInstanceToLoadBalancers(instanceID, albs); err != nil {
 			return err
 		}
-	}
-
-	if param.LoadBalancerName != "" {
+	} else {
 		albs, err := elbv2Client.GetLoadBalancersByNames([]string{param.LoadBalancerName})
 		if err != nil {
 			return err
