@@ -52,11 +52,9 @@ func Detach(param *DetachParam) error {
 		return err
 	}
 
-	if len(lbs) > 0 {
-		log.Println("-->", "Detaching", instanceID, "from", lbs)
-		if err := albClient.RemoveInstanceFromLoadBalancers(instanceID, lbs); err != nil {
-			return err
-		}
+	log.Println("-->", "Detaching", instanceID, "from", lbs)
+	if err := albClient.RemoveInstanceFromLoadBalancers(instanceID, lbs); err != nil {
+		return err
 	}
 
 	return nil
