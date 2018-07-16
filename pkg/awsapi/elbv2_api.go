@@ -11,4 +11,6 @@ type ELBv2API interface {
 	DescribeLoadBalancers(*elbv2.DescribeLoadBalancersInput) (*elbv2.DescribeLoadBalancersOutput, error)
 	RegisterTargets(*elbv2.RegisterTargetsInput) (*elbv2.RegisterTargetsOutput, error)
 	DeregisterTargets(*elbv2.DeregisterTargetsInput) (*elbv2.DeregisterTargetsOutput, error)
+	WaitUntilTargetDeregistered(input *elbv2.DescribeTargetHealthInput) error
+	WaitUntilTargetInService(input *elbv2.DescribeTargetHealthInput) error
 }
