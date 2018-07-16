@@ -2,9 +2,11 @@
 
 ## [v0.1.1](https://github.com/yuuki/albio/compare/v0.1.0...v0.1.1) (2018-07-16)
 
+* Fix bug that 'attach --loadbalancer-name' is not working
 
 ## [v0.1.0](https://github.com/yuuki/albio/compare/...v0.1.0) (2018-07-16)
 
+* Initial release
 * Add --self option [#9](https://github.com/yuuki/albio/pull/9) ([yuuki](https://github.com/yuuki))
 * Use localfs for savepoint  [#8](https://github.com/yuuki/albio/pull/8) ([yuuki](https://github.com/yuuki))
 * Remove support for elbv1 [#7](https://github.com/yuuki/albio/pull/7) ([yuuki](https://github.com/yuuki))
@@ -15,6 +17,3 @@
 * Sub commands [#2](https://github.com/yuuki/albio/pull/2) ([yuuki](https://github.com/yuuki))
 * Implement --status option [#1](https://github.com/yuuki/albio/pull/1) ([yuuki](https://github.com/yuuki))
 
-## [v0.1.0](https://github.com/yuuki/albio/compare/...v0.1.0) (2018-07-16)
-
-* Initial release
