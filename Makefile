@@ -6,7 +6,7 @@ RELEASE_BUILD_LDFLAGS = -s -w $(BUILD_LDFLAGS)
 CREDITS = ./CREDITS
 
 .PHONY: build
-build: credits
+build:
 	go build -ldflags="$(BUILD_LDFLAGS)"
 
 .PHONY: test
@@ -25,8 +25,6 @@ devel-deps:
 	go get github.com/Songmu/ghch
 	go get github.com/Songmu/goxz
 	go get github.com/tcnksm/ghr
-
-credits-deps:
 
 .PHONY: credits
 credits:
