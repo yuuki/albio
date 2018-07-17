@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/elbv2"
+	"github.com/pkg/errors"
 	"github.com/yuuki/albio/pkg/awsapi"
 	"github.com/yuuki/albio/pkg/model"
 	"golang.org/x/sync/errgroup"
@@ -30,7 +31,7 @@ func New(sess *session.Session) ELBv2 {
 func (a *_elbv2) GetLoadBalancersFromInstanceID(instanceID string) (model.LoadBalancers, error) {
 	groupResp, err := a.svc.DescribeTargetGroups(&elbv2.DescribeTargetGroupsInput{})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "describe target groups error")
 	}
 
 	loadBalancerArnToTargets := make(map[string][]*elbv2.TargetDescription)
@@ -41,7 +42,7 @@ func (a *_elbv2) GetLoadBalancersFromInstanceID(instanceID string) (model.LoadBa
 			TargetGroupArn: group.TargetGroupArn,
 		})
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrapf(err, "describe target health error: %v", *group.TargetGroupArn)
 		}
 
 		found := false
@@ -68,7 +69,7 @@ func (a *_elbv2) GetLoadBalancersFromInstanceID(instanceID string) (model.LoadBa
 		LoadBalancerArns: loadBalancerArns,
 	})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "describe loadbalancers error: %v", loadBalancerArns)
 	}
 
 	return model.NewLoadBalancersFromELBv2(resp.LoadBalancers, loadBalancerArnToTargets), nil
@@ -88,7 +89,7 @@ func (a *_elbv2) GetLoadBalancersByNames(lbNames []string) (model.LoadBalancers,
 			TargetGroupArn: group.TargetGroupArn,
 		})
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrapf(err, "describe target health: %v", group.TargetGroupArn)
 		}
 		for _, desc := range resp.TargetHealthDescriptions {
 			for _, arn := range group.LoadBalancerArns {
@@ -118,7 +119,7 @@ func (a *_elbv2) AddInstanceToLoadBalancers(instanceID string, lbs model.LoadBal
 				Targets:        targets,
 			})
 			if err != nil {
-				return err
+				return errors.Wrapf(err, "register targets error: %v", group.TargetGroupArn)
 			}
 			return a.svc.WaitUntilTargetInService(&elbv2.DescribeTargetHealthInput{
 				TargetGroupArn: grp.TargetGroupArn,
@@ -145,7 +146,7 @@ func (a *_elbv2) RemoveInstanceFromLoadBalancers(instanceID string, lbs model.Lo
 				Targets:        targets,
 			})
 			if err != nil {
-				return err
+				return errors.Wrapf(err, "deregister targets error: %v", group.TargetGroupArn)
 			}
 			return a.svc.WaitUntilTargetDeregistered(&elbv2.DescribeTargetHealthInput{
 				TargetGroupArn: grp.TargetGroupArn,
@@ -166,7 +167,7 @@ func (a *_elbv2) findLoadBalancersAndTargetGroupsByLoadBalancerNames(lbNames []s
 		Names: names,
 	})
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.Wrapf(err, "describe loadbalancers error: %v", names)
 	}
 	groups := make([]*elbv2.TargetGroup, 0, len(lbResp.LoadBalancers))
 	for _, lb := range lbResp.LoadBalancers {
@@ -174,7 +175,7 @@ func (a *_elbv2) findLoadBalancersAndTargetGroupsByLoadBalancerNames(lbNames []s
 			LoadBalancerArn: lb.LoadBalancerArn,
 		})
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, errors.Wrapf(err, "describe target groups: %v", lb.LoadBalancerArn)
 		}
 		groups = append(groups, resp.TargetGroups...)
 	}
