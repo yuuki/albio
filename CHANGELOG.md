@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.2.1](https://github.com/yuuki/albio/compare/v0.2.0...v0.2.1) (2018-07-18)
+
+* Introduce pkg/errors [#11](https://github.com/yuuki/albio/pull/11) ([yuuki](https://github.com/yuuki))
+
 ## [v0.2.0](https://github.com/yuuki/albio/compare/v0.1.1...v0.2.0) (2018-07-16)
 
 * Wait until registred or deregisterd instance to the loadbalancer [#10](https://github.com/yuuki/albio/pull/10) ([yuuki](https://github.com/yuuki))
