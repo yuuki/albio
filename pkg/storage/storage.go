@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 
+	"github.com/pkg/errors"
 	"github.com/yuuki/albio/pkg/model"
 )
 
@@ -35,10 +36,10 @@ func SaveLoadBalancers(w io.Writer, instanceID string, loadbalancers model.LoadB
 	}
 	b, err := json.Marshal(result)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "json marshal error")
 	}
 	if _, err := fmt.Fprintf(w, "%s\n", b); err != nil {
-		return err
+		return errors.Wrap(err, "print json error")
 	}
 	return nil
 }
@@ -47,14 +48,14 @@ func SaveLoadBalancers(w io.Writer, instanceID string, loadbalancers model.LoadB
 func LoadLoadBalancers(r io.Reader, instanceID string) ([]LoadBalancer, error) {
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
-		return []LoadBalancer{}, err
+		return []LoadBalancer{}, errors.Wrap(err, "i/o read error")
 	}
 	var result struct {
 		LoadBalancers []LoadBalancer `json:"loadbalancers"`
 		InstanceID    string         `json:"instance-id"`
 	}
 	if err := json.Unmarshal(b, &result); err != nil {
-		return []LoadBalancer{}, err
+		return []LoadBalancer{}, errors.Wrap(err, "json unmarshal error")
 	}
 	if instanceID == result.InstanceID {
 		return result.LoadBalancers, nil

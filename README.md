@@ -48,6 +48,10 @@ $ cat /var/lib/albio/loadbalancers.json | albio attach --self
 --> Attaching i-0f5ffb9f0a75e6b85 to albtest001
 ```
 
+## Debugging
+
+Set non-zero number or non-empty string to the `ALBIO_DEBUG` enviroment variable.
+
 ## License
 
 [The MIT License](./LICENSE).
