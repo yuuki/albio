@@ -3,6 +3,7 @@ package ec2
 import (
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/pkg/errors"
 	"github.com/yuuki/albio/pkg/awsapi"
 )
 
@@ -24,7 +25,7 @@ func New(sess *session.Session) EC2 {
 func (e *_ec2) GetLocalInstanceID() (string, error) {
 	doc, err := e.metadataSvc.GetInstanceIdentityDocument()
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "ec2 metadata get error")
 	}
 	return doc.InstanceID, nil
 }
