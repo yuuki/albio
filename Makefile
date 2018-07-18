@@ -48,8 +48,10 @@ _release: devel-deps
 	@echo "--> Preparing release..."
 	_tools/release
 
+.PHONY: upload_artifacts
 upload_artifacts: devel-deps
 	@echo "--> Uploading release artifacts"
 	_tools/upload_artifacts
 
+.PHONY: release
 release: _release crossbuild upload_artifacts
