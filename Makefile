@@ -6,7 +6,7 @@ RELEASE_BUILD_LDFLAGS = -s -w $(BUILD_LDFLAGS)
 CREDITS = ./CREDITS
 
 .PHONY: build
-build:
+build: generate
 	go build -ldflags="$(BUILD_LDFLAGS)"
 
 .PHONY: test
@@ -31,12 +31,13 @@ credits:
 	@echo "--> Generating credits text..."
 	@go get github.com/go-bindata/go-bindata/...
 	_tools/credits > $(CREDITS)
-ifneq (,$(git status -s $(CREDITS)))
+
+.PHONY: generate
+generate:
 	go generate -x .
-endif
 
 .PHONY: crossbuild
-crossbuild: devel-deps credits
+crossbuild: devel-deps credits generate
 	@echo "--> Building release artifacts..."
 	$(eval ver = $(shell gobump show -r))
 	goxz -pv=v$(ver) -os=linux,darwin -arch=386,amd64 -build-ldflags="$(RELEASE_BUILD_LDFLAGS)" \

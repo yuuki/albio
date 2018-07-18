@@ -81,7 +81,7 @@ func credits() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "CREDITS", size: 43225, mode: os.FileMode(420), modTime: time.Unix(1531926268, 0)}
+	info := bindataFileInfo{name: "CREDITS", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
